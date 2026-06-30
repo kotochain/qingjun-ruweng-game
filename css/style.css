@@ -215,61 +215,194 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
 /* ---------------- 推理层 ---------------- */
 #puzzle-layer{
   position:absolute;inset:0;z-index:28;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;padding:40px;
-  background:radial-gradient(circle at 50% 35%,rgba(20,14,26,.85),rgba(8,5,12,.96));
+  align-items:center;padding:40px 28px 0;
+  background:radial-gradient(circle at 50% 30%,rgba(20,14,26,.88),rgba(8,5,12,.97));
   backdrop-filter:blur(6px);
+  overflow:hidden;
 }
-#puzzle-head{text-align:center;margin-bottom:26px;max-width:760px;}
+#puzzle-head{text-align:center;margin-bottom:18px;max-width:680px;flex-shrink:0;}
+.puzzle-kicker{
+  font-size:12px;letter-spacing:.4em;color:var(--cyan-deep);
+  margin-bottom:6px;opacity:.8;font-family:var(--font-sans);
+}
 #puzzle-title{
-  font-size:30px;font-weight:800;letter-spacing:.16em;color:var(--cyan);
-  text-shadow:0 0 24px rgba(127,227,214,.3);margin-bottom:12px;
+  font-size:28px;font-weight:800;letter-spacing:.18em;color:var(--cyan);
+  text-shadow:0 0 28px rgba(127,227,214,.35);margin-bottom:8px;
 }
-#puzzle-title::before,#puzzle-title::after{content:"◈";margin:0 .5em;color:var(--cyan-deep);font-size:18px;}
-#puzzle-desc{font-size:17px;line-height:1.8;color:#d9cdbe;}
+#puzzle-title::before,#puzzle-title::after{content:"◆";margin:0 .45em;color:var(--cyan-deep);font-size:16px;opacity:.6;vertical-align:middle;}
+#puzzle-desc{font-size:16px;line-height:1.8;color:#c9bcab;letter-spacing:.03em;}
+
 #clue-board{
-  display:flex;flex-wrap:wrap;gap:18px;justify-content:center;align-items:stretch;
-  max-width:920px;margin-bottom:14px;
+  display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:max-content;gap:14px;
+  max-width:780px;width:100%;padding-bottom:100px;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  flex:1;align-content:start;
+  scrollbar-width:none;
 }
+#clue-board::-webkit-scrollbar{display:none;}
 .clue-card{
-  position:relative;width:200px;padding:20px 18px;cursor:pointer;
-  background:linear-gradient(160deg,rgba(46,34,54,.92),rgba(26,18,32,.95));
-  border:1.5px solid rgba(232,196,121,.22);
+  position:relative;display:flex;flex-direction:column;cursor:pointer;align-self:start;
+  background:linear-gradient(180deg,rgba(46,34,54,.88),rgba(26,18,32,.94));
+  border:1.5px solid rgba(232,196,121,.18);
   border-radius:var(--radius-m);
-  box-shadow:0 8px 22px rgba(0,0,0,.4);
-  transition:transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s, border-color .3s, background .3s;
+  overflow:hidden;
+  box-shadow:0 6px 18px rgba(0,0,0,.4);
+  transition:transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s, border-color .35s;
+  -webkit-user-drag:none;
 }
-.clue-card:hover{transform:translateY(-5px);border-color:rgba(232,196,121,.5);box-shadow:0 14px 30px rgba(0,0,0,.5);}
+.clue-card:active{transform:scale(.96);}
 .clue-card.picked{
   border-color:var(--cyan);
-  background:linear-gradient(160deg,rgba(40,60,62,.95),rgba(22,34,36,.96));
-  box-shadow:0 14px 34px rgba(0,0,0,.5), 0 0 26px rgba(127,227,214,.3);
-  transform:translateY(-5px);
+  background:linear-gradient(180deg,rgba(38,58,60,.92),rgba(18,30,32,.96));
+  box-shadow:0 10px 28px rgba(0,0,0,.5), 0 0 22px rgba(127,227,214,.28);
+  transform:translateY(-4px) scale(1.02);
 }
-.clue-card.picked::before{
-  content:"◈";position:absolute;top:10px;right:12px;color:var(--cyan);font-size:14px;
-  filter:drop-shadow(0 0 6px rgba(127,227,214,.7));
+.clue-card.picked::after{
+  content:"✓";position:absolute;top:8px;right:10px;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--cyan);color:var(--ink);
+  font-size:13px;font-weight:700;line-height:22px;text-align:center;
+  font-family:var(--font-sans);
+  box-shadow:0 0 12px rgba(127,227,214,.6);
+  animation:checkPop .4s cubic-bezier(.34,1.56,.64,1);
 }
-.clue-icon{font-size:26px;margin-bottom:10px;display:block;filter:drop-shadow(0 2px 6px rgba(0,0,0,.4));}
-.clue-icon-img{width:40px;height:40px;object-fit:contain;margin-bottom:10px;display:block;filter:drop-shadow(0 2px 6px rgba(0,0,0,.4));}
-.clue-name{font-size:17px;font-weight:600;color:var(--paper);margin-bottom:8px;letter-spacing:.04em;}
-.clue-text{font-size:13.5px;line-height:1.65;color:var(--paper-dim);font-family:var(--font-sans);}
-#puzzle-foot{display:flex;align-items:center;gap:24px;margin-top:8px;}
-#puzzle-counter{font-size:14px;color:var(--paper-dim);letter-spacing:.1em;font-family:var(--font-sans);}
+@keyframes checkPop{
+  0%{transform:scale(0);}60%{transform:scale(1.25);}100%{transform:scale(1);}
+}
+.clue-card-img-wrap{
+  width:100%;aspect-ratio:1;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,rgba(30,20,38,.5),rgba(12,8,16,.85));
+  position:relative;
+}
+.clue-card-img-wrap::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 45%,rgba(232,196,121,.06),transparent 60%);
+  pointer-events:none;
+}
+.clue-icon{
+  font-size:48px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5));
+  position:relative;z-index:1;
+}
+.clue-icon-img{
+  width:72%;height:72%;object-fit:contain;
+  filter:drop-shadow(0 4px 14px rgba(0,0,0,.6)) drop-shadow(0 0 18px rgba(232,196,121,.12));
+  position:relative;z-index:1;
+  transition:transform .35s cubic-bezier(.22,1,.36,1);
+}
+.clue-card.picked .clue-icon-img{
+  transform:scale(1.08);
+  filter:drop-shadow(0 4px 14px rgba(0,0,0,.6)) drop-shadow(0 0 20px rgba(127,227,214,.35));
+}
+.clue-card-meta{
+  padding:8px 10px 10px;text-align:center;
+  border-top:1px solid rgba(232,196,121,.1);
+  background:linear-gradient(180deg,rgba(20,14,26,0),rgba(10,6,14,.6));
+}
+.clue-name{
+  font-size:14px;font-weight:600;color:var(--paper);letter-spacing:.08em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.clue-card.picked .clue-name{color:var(--cyan);}
+
+/* dock 底部槽位 */
+#puzzle-dock{
+  position:absolute;left:0;right:0;bottom:0;z-index:5;
+  display:flex;align-items:center;justify-content:center;gap:18px;
+  padding:14px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+  background:linear-gradient(to top,rgba(10,6,14,.98) 0%,rgba(10,6,14,.92) 60%,rgba(10,6,14,0) 100%);
+  backdrop-filter:blur(10px);
+}
+.dock-label{
+  font-size:12px;letter-spacing:.3em;color:var(--paper-dim);
+  font-family:var(--font-sans);white-space:nowrap;opacity:.7;
+}
+#puzzle-slots{display:flex;gap:10px;}
+.slot{
+  width:52px;height:52px;border-radius:var(--radius-m);
+  border:1.5px dashed rgba(232,196,121,.25);
+  background:rgba(20,14,26,.5);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+  transition:all .3s cubic-bezier(.22,1,.36,1);
+}
+.slot-num{
+  font-size:14px;color:rgba(232,196,121,.3);font-weight:600;letter-spacing:.05em;
+  font-family:var(--font-serif);
+  transition:opacity .2s;
+}
+.slot.filled{
+  border-style:solid;border-color:var(--cyan);background:rgba(20,36,38,.8);
+  box-shadow:0 0 18px rgba(127,227,214,.2);
+  animation:slotFill .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slotFill{
+  0%{transform:scale(.8);border-color:transparent;}
+  60%{transform:scale(1.12);}
+  100%{transform:scale(1);}
+}
+.slot.filled .slot-num{opacity:0;}
+.slot .slot-icon{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  animation:slotIconIn .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slotIconIn{
+  0%{transform:scale(0);opacity:0;}
+  100%{transform:scale(1);opacity:1;}
+}
+.slot .slot-icon img{
+  width:70%;height:70%;object-fit:contain;
+  filter:drop-shadow(0 2px 8px rgba(127,227,214,.4));
+}
+.slot.wrong{
+  border-color:var(--crimson);background:rgba(40,14,20,.7);
+  box-shadow:0 0 20px rgba(197,71,90,.4);
+  animation:slotShake .5s cubic-bezier(.36,.07,.19,.97);
+}
+@keyframes slotShake{
+  10%,90%{transform:translateX(-2px);}
+  20%,80%{transform:translateX(3px);}
+  30%,50%,70%{transform:translateX(-5px);}
+  40%,60%{transform:translateX(5px);}
+}
+#puzzle-submit{
+  font-size:16px;padding:12px 28px;letter-spacing:.2em;
+  transition:all .35s cubic-bezier(.22,1,.36,1);
+}
+#puzzle-submit:disabled{
+  opacity:.35;cursor:not-allowed;
+  filter:grayscale(.5) brightness(.7);
+  transform:none !important;
+  box-shadow:none !important;
+}
+#puzzle-submit:not(:disabled){
+  animation:submitGlow 2s ease-in-out infinite;
+}
+@keyframes submitGlow{
+  0%,100%{box-shadow:0 10px 26px rgba(184,146,63,.4), inset 0 1px 0 rgba(255,255,255,.4), 0 0 0 rgba(232,196,121,0);}
+  50%{box-shadow:0 10px 26px rgba(184,146,63,.5), inset 0 1px 0 rgba(255,255,255,.4), 0 0 24px rgba(232,196,121,.25);}
+}
 #puzzle-fail{
-  position:absolute;left:50%;top:20px;transform:translateX(-50%);
-  max-width:680px;padding:14px 28px;border-radius:var(--radius-m);font-size:15px;line-height:1.6;
-  background:rgba(20,14,26,.92);border:1px solid rgba(197,71,90,.5);color:#f0a9b3;text-align:center;z-index:5;
-  animation:boxIn .3s ease;
+  position:absolute;left:50%;top:16px;transform:translateX(-50%);
+  max-width:calc(100vw - 40px);padding:10px 22px;border-radius:var(--radius-m);font-size:14px;line-height:1.5;
+  background:rgba(30,14,18,.95);border:1px solid rgba(197,71,90,.55);color:#f0a9b3;text-align:center;z-index:6;
+  backdrop-filter:blur(8px);
+  animation:failIn .3s ease;
+  white-space:nowrap;
+}
+@keyframes failIn{
+  from{opacity:0;transform:translateX(-50%) translateY(-8px);}
+  to{opacity:1;transform:translateX(-50%) translateY(0);}
 }
 #puzzle-success{
   position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(circle at 50% 50%,rgba(13,8,16,.85),rgba(8,5,12,.96));
-  backdrop-filter:blur(8px);
+  background:radial-gradient(circle at 50% 50%,rgba(13,8,16,.88),rgba(8,5,12,.97));
+  backdrop-filter:blur(10px);
   animation:fadeIn .3s ease;
 }
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 .puzzle-success-inner{
-  max-width:560px;width:88vw;padding:36px 34px 30px;border-radius:var(--radius-l);text-align:center;
+  max-width:520px;width:88vw;padding:34px 30px 28px;border-radius:var(--radius-l);text-align:center;
   background:linear-gradient(180deg,rgba(34,24,40,.98),rgba(15,10,20,.99));
   border:1px solid rgba(127,227,214,.5);
   box-shadow:0 0 40px rgba(127,227,214,.15),var(--shadow);
@@ -280,11 +413,11 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
   text-shadow:0 0 20px rgba(127,227,214,.4);
 }
 .success-reveal-item{
-  font-size:16px;line-height:1.85;color:var(--paper);padding:12px 0;
+  font-size:15.5px;line-height:1.9;color:var(--paper);padding:12px 0;
   border-top:1px solid rgba(232,196,121,.12);
 }
 .success-reveal-item:first-of-type{border-top:none;}
-#puzzle-next{margin-top:24px;}
+#puzzle-next{margin-top:22px;}
 
 /* ---------------- 按钮通用 ---------------- */
 .soft-btn{
@@ -447,7 +580,8 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
   .title-main{font-size:72px;}
   .title-sub{font-size:19px;}
   .choice-btn{min-width:320px;font-size:18px;padding:18px 28px;}
-  .clue-card{width:170px;}
+  #clue-board{grid-template-columns:repeat(3,1fr);gap:12px;max-width:640px;}
+  .clue-name{font-size:14px;}
   #quick-menu{bottom:204px;}
   .setting-row{grid-template-columns:1fr;gap:14px;}
   .backlog-item{grid-template-columns:1fr;gap:6px;}
@@ -525,24 +659,42 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
   /* 触摸设备单击即确认，去掉 armed 二次确认 */
   .choice-btn.armed::after{display:none;}
 
-  /* 推理界面 - 竖屏单列更易读 */
-  #puzzle-layer{padding:16px 14px calc(20px + env(safe-area-inset-bottom, 0px));justify-content:flex-start;padding-top:max(50px,env(safe-area-inset-top,0px));overflow-y:auto;-webkit-overflow-scrolling:touch;}
-  #puzzle-head{margin-bottom:14px;}
-  #puzzle-title{font-size:22px;letter-spacing:.1em;margin-bottom:8px;}
-  #puzzle-title::before,#puzzle-title::after{font-size:14px;margin:0 .3em;}
-  #puzzle-desc{font-size:14px;line-height:1.75;}
-  #clue-board{gap:10px;max-width:100%;margin-bottom:10px;}
-  .clue-icon{font-size:26px;margin-bottom:0;text-align:center;line-height:1.4;}
-  .clue-icon-img{width:44px;height:44px;margin-bottom:0;}
-  .clue-card{width:100%;padding:14px 16px;border-radius:10px;display:grid;grid-template-columns:44px 1fr;gap:4px 12px;align-items:start;}
-  .clue-name{grid-column:2;font-size:16px;margin-bottom:4px;letter-spacing:.04em;}
-  .clue-text{grid-column:2;font-size:13.5px;line-height:1.65;font-family:var(--font-sans);}
-  .clue-card.picked{border-color:var(--cyan);background:linear-gradient(160deg,rgba(40,60,62,.95),rgba(22,34,36,.96));box-shadow:0 10px 28px rgba(0,0,0,.5), 0 0 20px rgba(127,227,214,.25);}
-  .clue-card.picked::before{content:"◈";position:absolute;top:12px;right:14px;color:var(--cyan);font-size:16px;filter:drop-shadow(0 0 8px rgba(127,227,214,.8));}
-  #puzzle-foot{gap:14px;flex-wrap:wrap;justify-content:center;margin-top:8px;width:100%;position:sticky;bottom:0;padding:8px 0 4px;background:linear-gradient(to top,rgba(13,8,16,.95),rgba(13,8,16,.6) 70%,transparent);}
-  #puzzle-counter{font-size:13px;width:100%;text-align:center;letter-spacing:.08em;}
-  #puzzle-submit{width:100%;max-width:280px;padding:14px;font-size:17px;}
-  #puzzle-fail{position:fixed;top:max(60px,calc(env(safe-area-inset-top,0px) + 50px));left:50%;transform:translateX(-50%);max-width:calc(100vw - 40px);padding:12px 20px;font-size:13.5px;line-height:1.6;border-radius:10px;z-index:20;}
+  /* 推理界面 - 竖屏：2列大图卡片 + 底部dock */
+  #puzzle-layer{
+    padding:0 12px 0;
+    padding-top:max(48px,env(safe-area-inset-top,0px));
+  }
+  .puzzle-kicker{font-size:11px;letter-spacing:.3em;margin-bottom:6px;}
+  #puzzle-head{margin-bottom:14px;padding:0 4px;}
+  #puzzle-title{font-size:22px;letter-spacing:.12em;margin-bottom:6px;}
+  #puzzle-title::before,#puzzle-title::after{font-size:13px;margin:0 .3em;}
+  #puzzle-desc{font-size:13.5px;line-height:1.7;}
+  #clue-board{
+    grid-template-columns:repeat(2,1fr);gap:10px;
+    padding-bottom:120px;max-width:100%;
+  }
+  .clue-card{border-radius:10px;}
+  .clue-card.picked{transform:translateY(-2px) scale(1.01);}
+  .clue-card.picked::after{top:6px;right:8px;width:20px;height:20px;line-height:20px;font-size:12px;}
+  .clue-card-meta{padding:8px 8px 10px;}
+  .clue-name{font-size:14px;letter-spacing:.05em;}
+  .clue-icon{font-size:42px;}
+  .clue-icon-img{width:70%;height:70%;}
+  #puzzle-dock{
+    gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));
+    flex-wrap:wrap;
+  }
+  .dock-label{font-size:11px;letter-spacing:.2em;width:100%;text-align:center;}
+  #puzzle-slots{gap:12px;}
+  .slot{width:50px;height:50px;border-radius:10px;}
+  .slot-num{font-size:13px;}
+  #puzzle-submit{font-size:15px;padding:11px 28px;letter-spacing:.18em;}
+  #puzzle-fail{
+    position:fixed;top:max(54px,calc(env(safe-area-inset-top,0px) + 46px));
+    left:50%;transform:translateX(-50%);
+    max-width:calc(100vw - 32px);padding:10px 18px;font-size:13px;
+    line-height:1.5;border-radius:10px;z-index:20;white-space:normal;
+  }
   .puzzle-success-inner{max-width:100%;width:calc(100vw - 32px);padding:28px 22px 24px;border-radius:12px;}
   .puzzle-success-title{font-size:17px;letter-spacing:.25em;margin-bottom:18px;}
   .success-reveal-item{font-size:14.5px;line-height:1.8;padding:10px 0;}

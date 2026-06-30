@@ -7,7 +7,7 @@
 <title>请君入瓮 · 烟花为聘</title>
 <link rel="preconnect" href="https://fonts.font.im">
 <link href="https://fonts.font.im/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=10">
+<link rel="stylesheet" href="css/style.css?v=11">
 </head>
 <body>
 <div id="app">
@@ -58,13 +58,19 @@
   <!-- 推理层 -->
   <div id="puzzle-layer" class="hidden">
     <div id="puzzle-head">
+      <div class="puzzle-kicker">◈ 找出破绽 ◈</div>
       <div id="puzzle-title">局中之眼</div>
       <div id="puzzle-desc"></div>
     </div>
     <div id="clue-board"></div>
-    <div id="puzzle-foot">
-      <div id="puzzle-counter"></div>
-      <button id="puzzle-submit" class="soft-btn">拼合线索</button>
+    <div id="puzzle-dock">
+      <div class="dock-label">已锁破绽</div>
+      <div id="puzzle-slots">
+        <div class="slot" data-idx="0"><span class="slot-num">一</span></div>
+        <div class="slot" data-idx="1"><span class="slot-num">二</span></div>
+        <div class="slot" data-idx="2"><span class="slot-num">三</span></div>
+      </div>
+      <button id="puzzle-submit" class="soft-btn" disabled>拼 合 线 索</button>
     </div>
     <div id="puzzle-fail" class="hidden"></div>
     <div id="puzzle-success" class="hidden">
@@ -99,7 +105,7 @@
       <p>本作是以剧本杀《请君入瓮》为灵感的同人互动剧情体验，主线聚焦 <b>皇甫赤华</b> 与 <b>雍门清夜</b>。</p>
       <p>你将以穿书者「杜盈华」的身份醒在公主皇甫赤华的身体里，在权谋夜宴中周旋、试探、抉择。你的每一次选择，都会改变与清夜之间的<b>心意</b>，也会改写这局棋的走向。</p>
       <p class="dim">操作：点击推进对话 · 推理时点选线索再拼合 · 手机端选项单击即落子。</p>
-      <p class="dim" style="text-align:center;margin-top:18px;letter-spacing:.1em;opacity:.5;font-size:12px;">BUILD v10 · 线索图版</p>
+      <p class="dim" style="text-align:center;margin-top:18px;letter-spacing:.1em;opacity:.5;font-size:12px;">BUILD v11 · 推理重构版</p>
       <button class="soft-btn" id="btn-about-close">明白了</button>
     </div>
   </div>
@@ -167,7 +173,7 @@
 
 </div>
 
-<script src="js/data.js?v=10"></script>
-<script src="js/engine.js?v=10"></script>
+<script src="js/data.js?v=11"></script>
+<script src="js/engine.js?v=11"></script>
 </body>
 </html>

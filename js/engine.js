@@ -442,13 +442,13 @@
     setTimeout(()=>gotoNode(c.goto),260);
   }
 
-  let puzzleState={picked:new Set(),conf:null};
+  let puzzleState={picked:[],conf:null};
   function renderPuzzle(conf){
     stopAutoSkip();
     dlgBox.classList.add("hidden");
-    puzzleState={picked:new Set(),conf:conf};
-    $("puzzle-submit").disabled=false;
-    $("puzzle-submit").style.opacity="";
+    puzzleState={picked:[],conf:conf};
+    const submitBtn=$("puzzle-submit");
+    submitBtn.disabled=true;
     $("puzzle-title").textContent=conf.title||"局中之眼";
     $("puzzle-desc").textContent=conf.desc||"";
     const board=$("clue-board");
@@ -460,35 +460,81 @@
       const iconHTML=clue.img
         ? `<img class="clue-icon-img" src="assets/clue_${escapeHTML(clue.id)}.png" alt="">`
         : `<span class="clue-icon">${escapeHTML(clue.icon||"❖")}</span>`;
-      card.innerHTML=`${iconHTML}
-        <div class="clue-name">${escapeHTML(clue.name)}</div>
-        <div class="clue-text">${escapeHTML(clue.text)}</div>`;
+      card.innerHTML=`<div class="clue-card-img-wrap">${iconHTML}</div>
+        <div class="clue-card-meta"><div class="clue-name">${escapeHTML(clue.name)}</div></div>`;
       card.addEventListener("click",()=>{
         if(puzzleState.locked)return;
-        if(puzzleState.picked.has(clue.id)){
-          puzzleState.picked.delete(clue.id);card.classList.remove("picked");
+        const idx=puzzleState.picked.indexOf(clue.id);
+        if(idx>=0){
+          puzzleState.picked.splice(idx,1);
+          card.classList.remove("picked");
         }else{
-          if(puzzleState.picked.size>=conf.need){
+          if(puzzleState.picked.length>=conf.need){
             showToast(`最多只能选 ${conf.need} 处`);return;
           }
-          puzzleState.picked.add(clue.id);card.classList.add("picked");
+          puzzleState.picked.push(clue.id);
+          card.classList.add("picked");
         }
-        updatePuzzleCounter();
+        fillSlots();
+        updateSubmitState();
       });
       board.appendChild(card);
     });
-    updatePuzzleCounter();
+    fillSlots();
+    updateSubmitState();
     $("puzzle-fail").classList.add("hidden");
     $("puzzle-success").classList.add("hidden");
     document.querySelectorAll(".clue-card").forEach(c=>{c.style.pointerEvents="";c.classList.remove("picked");});
     puzzleState.locked=false;
     puzzleLayer.classList.remove("hidden");
     puzzleLayer.scrollTop=0;
+    board.scrollTop=0;
   }
 
-  function updatePuzzleCounter(){
-    const c=puzzleState.conf;
-    $("puzzle-counter").textContent=`已择 ${puzzleState.picked.size} / ${c.need} 处破绽`;
+  function fillSlots(){
+    const slots=document.querySelectorAll("#puzzle-slots .slot");
+    const conf=puzzleState.conf;
+    slots.forEach((slot,i)=>{
+      slot.classList.remove("filled","wrong");
+      const old=slot.querySelector(".slot-icon");
+      if(old)old.remove();
+      const id=puzzleState.picked[i];
+      if(id){
+        slot.classList.add("filled");
+        const clue=conf.clues.find(c=>c.id===id);
+        if(clue){
+          const wrap=document.createElement("div");
+          wrap.className="slot-icon";
+          if(clue.img){
+            wrap.innerHTML=`<img src="assets/clue_${escapeHTML(clue.id)}.png" alt="">`;
+          }else{
+            wrap.textContent=clue.icon||"❖";
+            wrap.style.fontSize="22px";
+          }
+          slot.appendChild(wrap);
+        }
+      }
+    });
+  }
+
+  function updateSubmitState(){
+    const btn=$("puzzle-submit");
+    btn.disabled=puzzleState.picked.length!==puzzleState.conf.need;
+  }
+
+  function onSlotClick(e){
+    if(puzzleState.locked)return;
+    const slot=e.target.closest(".slot");
+    if(!slot)return;
+    const idx=Number(slot.dataset.idx);
+    if(idx>=0 && idx<puzzleState.picked.length){
+      const removedId=puzzleState.picked[idx];
+      puzzleState.picked.splice(idx,1);
+      const card=document.querySelector(`.clue-card[data-id="${removedId}"]`);
+      if(card)card.classList.remove("picked");
+      fillSlots();
+      updateSubmitState();
+    }
   }
 
   function showPuzzleFail(text){
@@ -503,29 +549,34 @@
 
   function submitPuzzle(){
     const conf=puzzleState.conf;
-    if(puzzleState.picked.size!==conf.need){
-      showToast(`请选满 ${conf.need} 处再拼合`);return;
-    }
+    if(puzzleState.picked.length!==conf.need)return;
     const correctIds=conf.clues.filter(c=>c.correct).map(c=>c.id);
-    const allRight=[...puzzleState.picked].every(id=>correctIds.includes(id));
+    const allRight=puzzleState.picked.every(id=>correctIds.includes(id));
     if(allRight){
       puzzleState.locked=true;
-      $("puzzle-submit").disabled=true;
-      $("puzzle-submit").style.opacity=".4";
+      const submitBtn=$("puzzle-submit");
+      submitBtn.disabled=true;
       document.querySelectorAll(".clue-card").forEach(c=>c.style.pointerEvents="none");
       const list=$("puzzle-success-list");
-      list.innerHTML=conf.clues.filter(c=>c.correct).map(c=>
-        `<div class="success-reveal-item">${escapeHTML(c.reveal)}</div>`
-      ).join("");
-      $("puzzle-success").classList.remove("hidden");
-    }else{
-      const wrong=[...puzzleState.picked].find(id=>!correctIds.includes(id));
-      const wc=conf.clues.find(c=>c.id===wrong);
-      showPuzzleFail("✗ 其中混入了寻常之物——"+(wc?wc.reveal:"再想想，哪一处带着人为的痕迹。"));
+      list.innerHTML=puzzleState.picked.map(id=>{
+        const c=conf.clues.find(cl=>cl.id===id);
+        return c ? `<div class="success-reveal-item">${escapeHTML(c.reveal)}</div>`:"";
+      }).join("");
       setTimeout(()=>{
-        puzzleState.picked.clear();
+        $("puzzle-success").classList.remove("hidden");
+      },350);
+    }else{
+      const slots=document.querySelectorAll("#puzzle-slots .slot");
+      slots.forEach(s=>s.classList.add("wrong"));
+      const wrong=puzzleState.picked.find(id=>!correctIds.includes(id));
+      const wc=conf.clues.find(c=>c.id===wrong);
+      showPuzzleFail("其中混入了寻常之物——"+(wc?wc.name+"："+wc.reveal:"再想想，哪一处带着人为的痕迹。"));
+      setTimeout(()=>{
+        puzzleState.picked=[];
         document.querySelectorAll(".clue-card").forEach(c=>c.classList.remove("picked"));
-        updatePuzzleCounter();
+        slots.forEach(s=>s.classList.remove("wrong"));
+        fillSlots();
+        updateSubmitState();
       },1600);
     }
   }
@@ -534,6 +585,11 @@
     const conf=puzzleState.conf;
     $("puzzle-success").classList.add("hidden");
     puzzleLayer.classList.add("hidden");
+    document.querySelectorAll("#puzzle-slots .slot").forEach(s=>{
+      s.classList.remove("filled","wrong");
+      const old=s.querySelector(".slot-icon");
+      if(old)old.remove();
+    });
     gotoNode(conf.onWin);
   }
 
@@ -603,6 +659,7 @@
 
     $("puzzle-submit").addEventListener("click",submitPuzzle);
     $("puzzle-next").addEventListener("click",continueAfterPuzzle);
+    $("puzzle-slots").addEventListener("click",onSlotClick);
 
     $("q-save").addEventListener("click",save);
     $("q-load").addEventListener("click",load);
