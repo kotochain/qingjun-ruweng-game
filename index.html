@@ -7,7 +7,7 @@
 <title>请君入瓮 · 烟花为聘</title>
 <link rel="preconnect" href="https://fonts.font.im">
 <link href="https://fonts.font.im/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=7">
+<link rel="stylesheet" href="css/style.css?v=8">
 </head>
 <body>
 <div id="app">
@@ -66,7 +66,14 @@
       <div id="puzzle-counter"></div>
       <button id="puzzle-submit" class="soft-btn">拼合线索</button>
     </div>
-    <div id="puzzle-feedback" class="hidden"></div>
+    <div id="puzzle-fail" class="hidden"></div>
+    <div id="puzzle-success" class="hidden">
+      <div class="puzzle-success-inner">
+        <div class="puzzle-success-title">◈ 线索拼合 ◈</div>
+        <div id="puzzle-success-list"></div>
+        <button id="puzzle-next" class="soft-btn cyan">继续</button>
+      </div>
+    </div>
   </div>
 
   <!-- 标题画面 -->
@@ -159,7 +166,7 @@
 
 </div>
 
-<script src="js/data.js?v=7"></script>
-<script src="js/engine.js?v=7"></script>
+<script src="js/data.js?v=8"></script>
+<script src="js/engine.js?v=8"></script>
 </body>
 </html>

@@ -457,10 +457,14 @@
       const card=document.createElement("div");
       card.className="clue-card";
       card.dataset.id=clue.id;
-      card.innerHTML=`<span class="clue-icon">${escapeHTML(clue.icon)}</span>
+      const iconHTML=clue.img
+        ? `<img class="clue-icon-img" src="assets/clue_${escapeHTML(clue.id)}.png" alt="">`
+        : `<span class="clue-icon">${escapeHTML(clue.icon||"❖")}</span>`;
+      card.innerHTML=`${iconHTML}
         <div class="clue-name">${escapeHTML(clue.name)}</div>
         <div class="clue-text">${escapeHTML(clue.text)}</div>`;
       card.addEventListener("click",()=>{
+        if(puzzleState.locked)return;
         if(puzzleState.picked.has(clue.id)){
           puzzleState.picked.delete(clue.id);card.classList.remove("picked");
         }else{
@@ -474,13 +478,27 @@
       board.appendChild(card);
     });
     updatePuzzleCounter();
-    $("puzzle-feedback").classList.add("hidden");
+    $("puzzle-fail").classList.add("hidden");
+    $("puzzle-success").classList.add("hidden");
+    document.querySelectorAll(".clue-card").forEach(c=>{c.style.pointerEvents="";c.classList.remove("picked");});
+    puzzleState.locked=false;
     puzzleLayer.classList.remove("hidden");
+    puzzleLayer.scrollTop=0;
   }
 
   function updatePuzzleCounter(){
     const c=puzzleState.conf;
     $("puzzle-counter").textContent=`已择 ${puzzleState.picked.size} / ${c.need} 处破绽`;
+  }
+
+  function showPuzzleFail(text){
+    const fail=$("puzzle-fail");
+    fail.textContent=text;
+    fail.classList.remove("hidden");
+    clearTimeout(puzzleState._failT);
+    puzzleState._failT=setTimeout(()=>{
+      fail.classList.add("hidden");
+    },2800);
   }
 
   function submitPuzzle(){
@@ -490,40 +508,33 @@
     }
     const correctIds=conf.clues.filter(c=>c.correct).map(c=>c.id);
     const allRight=[...puzzleState.picked].every(id=>correctIds.includes(id));
-    const fb=$("puzzle-feedback");
     if(allRight){
-      fb.className="ok";
-      fb.innerHTML="◈ 线索拼合 ◈<br>"+conf.clues.filter(c=>c.correct).map(c=>escapeHTML(c.reveal)).join("<br>")+"<br><span style='display:inline-block;margin-top:14px;font-size:13px;opacity:.7;letter-spacing:.2em;'>▸ 点击任意处继续 ◂</span>";
-      fb.classList.remove("hidden");
+      puzzleState.locked=true;
       $("puzzle-submit").disabled=true;
       $("puzzle-submit").style.opacity=".4";
       document.querySelectorAll(".clue-card").forEach(c=>c.style.pointerEvents="none");
-      clearTimeout(puzzleState._autoT);
-      const onNext=()=>{
-        puzzleLayer.removeEventListener("click",onNext);
-        clearTimeout(puzzleState._autoT);
-        $("puzzle-submit").disabled=false;
-        $("puzzle-submit").style.opacity="";
-        puzzleLayer.classList.add("hidden");
-        gotoNode(conf.onWin);
-      };
-      puzzleState._autoT=setTimeout(()=>{
-        puzzleLayer.addEventListener("click",onNext,{once:true});
-      },600);
+      const list=$("puzzle-success-list");
+      list.innerHTML=conf.clues.filter(c=>c.correct).map(c=>
+        `<div class="success-reveal-item">${escapeHTML(c.reveal)}</div>`
+      ).join("");
+      $("puzzle-success").classList.remove("hidden");
     }else{
-      fb.className="no";
       const wrong=[...puzzleState.picked].find(id=>!correctIds.includes(id));
       const wc=conf.clues.find(c=>c.id===wrong);
-      fb.innerHTML="✗ 其中混入了「寻常」之物——<br>"+escapeHTML(wc?wc.reveal:"再想想，哪一处带着人为的痕迹。");
-      fb.classList.remove("hidden");
-      clearTimeout(puzzleState._autoT);
-      puzzleState._autoT=setTimeout(()=>{
-        fb.classList.add("hidden");
+      showPuzzleFail("✗ 其中混入了寻常之物——"+(wc?wc.reveal:"再想想，哪一处带着人为的痕迹。"));
+      setTimeout(()=>{
         puzzleState.picked.clear();
         document.querySelectorAll(".clue-card").forEach(c=>c.classList.remove("picked"));
         updatePuzzleCounter();
-      },4200);
+      },1600);
     }
+  }
+
+  function continueAfterPuzzle(){
+    const conf=puzzleState.conf;
+    $("puzzle-success").classList.add("hidden");
+    puzzleLayer.classList.add("hidden");
+    gotoNode(conf.onWin);
   }
 
   function endGame(){
@@ -591,6 +602,7 @@
     $("btn-about-close").addEventListener("click",()=>$("about-screen").classList.add("hidden"));
 
     $("puzzle-submit").addEventListener("click",submitPuzzle);
+    $("puzzle-next").addEventListener("click",continueAfterPuzzle);
 
     $("q-save").addEventListener("click",save);
     $("q-load").addEventListener("click",load);
