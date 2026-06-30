@@ -7,7 +7,7 @@
 <title>请君入瓮 · 烟花为聘</title>
 <link rel="preconnect" href="https://fonts.font.im">
 <link href="https://fonts.font.im/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=11">
+<link rel="stylesheet" href="css/style.css?v=13">
 </head>
 <body>
 <div id="app">
@@ -85,9 +85,15 @@
   <!-- 标题画面 -->
   <div id="title-screen">
     <div id="title-bg"></div>
+    <div class="title-corners" aria-hidden="true">
+      <span class="tc tl"></span><span class="tc tr"></span>
+      <span class="tc bl"></span><span class="tc br"></span>
+    </div>
+    <div class="title-seal-stamp" aria-hidden="true">華</div>
     <div id="title-content">
       <div class="title-seal">东方剧制 · 互动改编</div>
       <h1 class="title-main">请君入瓮</h1>
+      <div class="title-divider" aria-hidden="true"><span class="td-dot"></span></div>
       <div class="title-sub">烟花为聘 · 赤华篇</div>
       <div class="title-menu">
         <button class="menu-btn" id="btn-start">入 局</button>
@@ -105,7 +111,7 @@
       <p>本作是以剧本杀《请君入瓮》为灵感的同人互动剧情体验，主线聚焦 <b>皇甫赤华</b> 与 <b>雍门清夜</b>。</p>
       <p>你将以穿书者「杜盈华」的身份醒在公主皇甫赤华的身体里，在权谋夜宴中周旋、试探、抉择。你的每一次选择，都会改变与清夜之间的<b>心意</b>，也会改写这局棋的走向。</p>
       <p class="dim">操作：点击推进对话 · 推理时点选线索再拼合 · 手机端选项单击即落子。</p>
-      <p class="dim" style="text-align:center;margin-top:18px;letter-spacing:.1em;opacity:.5;font-size:12px;">BUILD v12 · 线索重排版</p>
+      <p class="dim" style="text-align:center;margin-top:18px;letter-spacing:.1em;opacity:.5;font-size:12px;">BUILD v13 · 开屏仪式感 + 底部工具栏</p>
       <button class="soft-btn" id="btn-about-close">明白了</button>
     </div>
   </div>
@@ -157,15 +163,15 @@
     </div>
   </div>
 
-  <!-- 设置/菜单按钮 -->
-  <div id="quick-menu">
-    <button class="q-btn" id="q-save" data-tip="存局">存</button>
-    <button class="q-btn" id="q-load" data-tip="读局">读</button>
-    <button class="q-btn" id="q-backlog" data-tip="回想">历</button>
-    <button class="q-btn" id="q-auto" data-tip="自动">自</button>
-    <button class="q-btn" id="q-skip" data-tip="跳过">跳</button>
-    <button class="q-btn" id="q-settings" data-tip="设置">设</button>
-    <button class="q-btn" id="q-home" data-tip="回标题">幕</button>
+  <!-- 底部工具栏 -->
+  <div id="bottom-bar" class="hidden">
+    <button class="bar-btn" id="q-save" data-tip="存局">存</button>
+    <button class="bar-btn" id="q-load" data-tip="读局">读</button>
+    <button class="bar-btn" id="q-backlog" data-tip="回想">历</button>
+    <button class="bar-btn" id="q-auto" data-tip="自动">自</button>
+    <button class="bar-btn" id="q-skip" data-tip="跳过">跳</button>
+    <button class="bar-btn" id="q-settings" data-tip="设置">设</button>
+    <button class="bar-btn" id="q-home" data-tip="回标题">幕</button>
   </div>
 
   <!-- 提示气泡 -->
@@ -174,6 +180,6 @@
 </div>
 
 <script src="js/data.js?v=11"></script>
-<script src="js/engine.js?v=11"></script>
+<script src="js/engine.js?v=13"></script>
 </body>
 </html>

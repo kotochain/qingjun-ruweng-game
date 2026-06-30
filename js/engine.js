@@ -628,6 +628,7 @@
     const data=loadJSON(SAVE_KEY,null);
     if(!data){showToast("尚无存档");return;}
     $("title-screen").classList.add("hidden");
+    $("bottom-bar").classList.remove("hidden");
     state.aff=data.aff||0;affVal.textContent=state.aff;
     state.history=Array.isArray(data.history)?data.history:[];
     setPov(data.pov||"heroine");
@@ -637,6 +638,7 @@
 
   function startGame(){
     $("title-screen").classList.add("hidden");
+    $("bottom-bar").classList.remove("hidden");
     state.aff=0;affVal.textContent="0";
     state.history=[];
     gotoNode("intro_modern");
@@ -647,6 +649,7 @@
     puzzleLayer.classList.add("hidden");closeBacklog();closeSettings();clearSprites();
     bgA.classList.remove("show");bgB.classList.remove("show");
     $("title-screen").classList.remove("hidden");
+    $("bottom-bar").classList.add("hidden");
   }
 
   function bind(){
