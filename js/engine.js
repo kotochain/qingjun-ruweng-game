@@ -316,9 +316,9 @@
       state.chapterTimers=[];
       chapterCard.classList.remove("show");
       state.chapterDone=null;
-      state.chapterTimers.push(setTimeout(cb,260));
+      state.chapterTimers.push(setTimeout(cb,120));
     };
-    state.chapterTimers.push(setTimeout(state.chapterDone,2200));
+    state.chapterTimers.push(setTimeout(state.chapterDone,2000));
   }
 
   function skipChapter(){
@@ -333,14 +333,18 @@
     if(!node){console.warn("missing node",key);return;}
 
     const enter=()=>{
-      if(node.bg)setBg(node.bg);
       if(node.pov)setPov(node.pov);
       if(node.isChoice){clearSprites();if(node.sprite)setSprite(node.sprite);renderChoices(node);return;}
       if(node.puzzle){clearSprites();renderPuzzle(node.puzzle);return;}
       clearSprites();
       dlgBox.classList.remove("hidden");
+      dlgBox.style.animation="none";
+      void dlgBox.offsetWidth;
+      dlgBox.style.animation="";
       advanceLine();
     };
+
+    if(node.bg)setBg(node.bg);
 
     if(node.chapter && !startLine){
       dlgBox.classList.add("hidden");
