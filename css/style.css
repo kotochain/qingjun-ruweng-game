@@ -445,9 +445,11 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
   .aff-val{font-size:15px;min-width:22px;}
   .hud-pov{font-size:11px;letter-spacing:.15em;padding:6px 12px;}
 
-  /* 立绘 - 竖屏下缩小避免被对话框截断 */
-  .sprite-slot{height:78%;width:56%;}
-  #slot-center{margin-left:-28%;}
+  /* 立绘 - 竖屏下加宽，下半部分由对话框自然遮挡 */
+  .sprite-slot{height:88%;width:68%;}
+  #slot-left{left:-8%;}
+  #slot-center{left:50%;margin-left:-34%;}
+  #slot-right{right:-8%;}
 
   /* 快捷菜单 - 缩小并贴边 */
   #quick-menu{right:10px;bottom:calc(180px + env(safe-area-inset-bottom, 0px));gap:7px;}
@@ -534,7 +536,8 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
 
 /* 小屏短高度手机（如iPhone SE） */
 @media (max-width:520px) and (max-height:720px){
-  .sprite-slot{height:72%;}
+  .sprite-slot{height:84%;width:72%;}
+  #slot-center{margin-left:-36%;}
   #quick-menu{bottom:calc(168px + env(safe-area-inset-bottom, 0px));gap:6px;}
   .q-btn{width:34px;height:34px;font-size:12px;}
   #dialogue-box{padding:18px 18px 22px;}
