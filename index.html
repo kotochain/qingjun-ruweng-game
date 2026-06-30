@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>请君入瓮 · 烟花为聘</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- 背景层 -->
+  <div id="bg-layer">
+    <div class="bg-img" id="bg-a"></div>
+    <div class="bg-img" id="bg-b"></div>
+    <div id="bg-vignette"></div>
+  </div>
+
+  <!-- 立绘层 -->
+  <div id="sprite-layer">
+    <div class="sprite-slot" id="slot-left"></div>
+    <div class="sprite-slot" id="slot-center"></div>
+    <div class="sprite-slot" id="slot-right"></div>
+  </div>
+
+  <!-- 章节/视角提示 -->
+  <div id="chapter-card">
+    <div class="chapter-inner">
+      <div class="chapter-sub" id="chapter-sub">第一幕</div>
+      <div class="chapter-title" id="chapter-title">瓮中初醒</div>
+      <div class="chapter-pov" id="chapter-pov"></div>
+    </div>
+  </div>
+
+  <!-- 顶部 HUD -->
+  <div id="hud">
+    <div class="hud-affinity" id="aff-qingye" title="雍门清夜 · 心意">
+      <span class="aff-icon">❖</span>
+      <span class="aff-name">清夜</span>
+      <span class="aff-val" id="aff-qingye-val">0</span>
+    </div>
+    <div class="hud-pov" id="hud-pov">皇甫赤华 · 视角</div>
+  </div>
+
+  <!-- 对话框 -->
+  <div id="dialogue-box" class="hidden">
+    <div id="speaker-tag" class="hidden"><span id="speaker-name"></span></div>
+    <div id="dialogue-text"></div>
+    <div id="continue-hint">▾</div>
+  </div>
+
+  <!-- 选项层 -->
+  <div id="choice-layer" class="hidden"></div>
+
+  <!-- 推理层 -->
+  <div id="puzzle-layer" class="hidden">
+    <div id="puzzle-head">
+      <div id="puzzle-title">局中之眼</div>
+      <div id="puzzle-desc"></div>
+    </div>
+    <div id="clue-board"></div>
+    <div id="puzzle-foot">
+      <div id="puzzle-counter"></div>
+      <button id="puzzle-submit" class="soft-btn">拼合线索</button>
+    </div>
+    <div id="puzzle-feedback" class="hidden"></div>
+  </div>
+
+  <!-- 标题画面 -->
+  <div id="title-screen">
+    <div id="title-bg"></div>
+    <div id="title-content">
+      <div class="title-seal">东方剧制 · 互动改编</div>
+      <h1 class="title-main">请君入瓮</h1>
+      <div class="title-sub">烟花为聘 · 赤华篇</div>
+      <div class="title-menu">
+        <button class="menu-btn" id="btn-start">入 局</button>
+        <button class="menu-btn ghost" id="btn-continue">续 局</button>
+        <button class="menu-btn ghost" id="btn-about">关于此局</button>
+      </div>
+      <div class="title-foot">改编自剧本杀《请君入瓮》· 仅供同人互动体验</div>
+    </div>
+  </div>
+
+  <!-- 关于弹层 -->
+  <div id="about-screen" class="overlay hidden">
+    <div class="overlay-card">
+      <h2>关于此局</h2>
+      <p>本作是以剧本杀《请君入瓮》为灵感的同人互动剧情体验，主线聚焦 <b>皇甫赤华</b> 与 <b>雍门清夜</b>。</p>
+      <p>你将以穿书者「杜盈华」的身份醒在公主皇甫赤华的身体里，在权谋夜宴中周旋、试探、抉择。你的每一次选择，都会改变与清夜之间的<b>心意</b>，也会改写这局棋的走向。</p>
+      <p class="dim">操作：点击推进对话 · 点击选项浮起后再次点击确认 · 推理时点选线索卡再拼合。</p>
+      <button class="soft-btn" id="btn-about-close">明白了</button>
+    </div>
+  </div>
+
+  <!-- 历史记录 -->
+  <div id="backlog-screen" class="overlay hidden">
+    <div class="system-card backlog-card">
+      <div class="system-head">
+        <div>
+          <div class="system-kicker">BACKLOG</div>
+          <h2>文字回想</h2>
+        </div>
+        <button class="round-close" id="btn-backlog-close" title="关闭">×</button>
+      </div>
+      <div id="backlog-list"></div>
+      <div class="system-foot">PageUp / 鼠标上滚打开 · Esc 关闭</div>
+    </div>
+  </div>
+
+  <!-- 设置面板 -->
+  <div id="settings-screen" class="overlay hidden">
+    <div class="system-card settings-card">
+      <div class="system-head">
+        <div>
+          <div class="system-kicker">CONFIG</div>
+          <h2>系统设置</h2>
+        </div>
+        <button class="round-close" id="btn-settings-close" title="关闭">×</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <label for="setting-text-speed">文字速度</label>
+          <p>越靠右越快，点击时仍可立刻显示整句。</p>
+        </div>
+        <input id="setting-text-speed" type="range" min="10" max="70" step="1">
+      </div>
+      <div class="setting-row">
+        <div>
+          <label for="setting-auto-speed">自动播放间隔</label>
+          <p>控制 Auto 模式每句之后停留多久。</p>
+        </div>
+        <input id="setting-auto-speed" type="range" min="400" max="2600" step="100">
+      </div>
+      <div class="setting-actions">
+        <button class="soft-btn cyan" id="btn-fullscreen">全屏切换</button>
+        <button class="soft-btn" id="btn-settings-reset">恢复默认</button>
+      </div>
+      <div class="system-foot">A 自动播放 · S 跳过已读 · B 历史 · Esc 关闭</div>
+    </div>
+  </div>
+
+  <!-- 设置/菜单按钮 -->
+  <div id="quick-menu">
+    <button class="q-btn" id="q-save" title="存局">存</button>
+    <button class="q-btn" id="q-load" title="读局">读</button>
+    <button class="q-btn" id="q-backlog" title="文字回想">历</button>
+    <button class="q-btn" id="q-auto" title="自动播放">自</button>
+    <button class="q-btn" id="q-skip" title="跳过已读">跳</button>
+    <button class="q-btn" id="q-settings" title="系统设置">设</button>
+    <button class="q-btn" id="q-home" title="回到标题">幕</button>
+  </div>
+
+  <!-- 提示气泡 -->
+  <div id="toast" class="hidden"></div>
+
+</div>
+
+<script src="js/data.js?v=3"></script>
+<script src="js/engine.js?v=3"></script>
+</body>
+</html>
