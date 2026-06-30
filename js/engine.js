@@ -435,6 +435,8 @@
     stopAutoSkip();
     dlgBox.classList.add("hidden");
     puzzleState={picked:new Set(),conf:conf};
+    $("puzzle-submit").disabled=false;
+    $("puzzle-submit").style.opacity="";
     $("puzzle-title").textContent=conf.title||"局中之眼";
     $("puzzle-desc").textContent=conf.desc||"";
     const board=$("clue-board");
@@ -479,24 +481,36 @@
     const fb=$("puzzle-feedback");
     if(allRight){
       fb.className="ok";
-      fb.innerHTML="◈ 线索拼合 ◈<br>"+conf.clues.filter(c=>c.correct).map(c=>escapeHTML(c.reveal)).join("<br>");
+      fb.innerHTML="◈ 线索拼合 ◈<br>"+conf.clues.filter(c=>c.correct).map(c=>escapeHTML(c.reveal)).join("<br>")+"<br><span style='display:inline-block;margin-top:14px;font-size:13px;opacity:.7;letter-spacing:.2em;'>▸ 点击任意处继续 ◂</span>";
       fb.classList.remove("hidden");
-      setTimeout(()=>{
+      $("puzzle-submit").disabled=true;
+      $("puzzle-submit").style.opacity=".4";
+      document.querySelectorAll(".clue-card").forEach(c=>c.style.pointerEvents="none");
+      clearTimeout(puzzleState._autoT);
+      const onNext=()=>{
+        puzzleLayer.removeEventListener("click",onNext);
+        clearTimeout(puzzleState._autoT);
+        $("puzzle-submit").disabled=false;
+        $("puzzle-submit").style.opacity="";
         puzzleLayer.classList.add("hidden");
         gotoNode(conf.onWin);
-      },3400);
+      };
+      puzzleState._autoT=setTimeout(()=>{
+        puzzleLayer.addEventListener("click",onNext,{once:true});
+      },600);
     }else{
       fb.className="no";
       const wrong=[...puzzleState.picked].find(id=>!correctIds.includes(id));
       const wc=conf.clues.find(c=>c.id===wrong);
       fb.innerHTML="✗ 其中混入了「寻常」之物——<br>"+escapeHTML(wc?wc.reveal:"再想想，哪一处带着人为的痕迹。");
       fb.classList.remove("hidden");
-      setTimeout(()=>{
+      clearTimeout(puzzleState._autoT);
+      puzzleState._autoT=setTimeout(()=>{
         fb.classList.add("hidden");
         puzzleState.picked.clear();
         document.querySelectorAll(".clue-card").forEach(c=>c.classList.remove("picked"));
         updatePuzzleCounter();
-      },3200);
+      },4200);
     }
   }
 
