@@ -313,7 +313,6 @@
     $("chapter-title").textContent=ch.title||"";
     $("chapter-pov").textContent=ch.pov||"";
     chapterCard.classList.add("show");
-    if(window.AudioSys)AudioSys.sfxChapter();
     state.chapterDone=()=>{
       state.chapterTimers.forEach(clearTimeout);
       state.chapterTimers=[];
@@ -384,7 +383,6 @@
   function onAdvanceClick(){
     if(state.autoMode || state.skipMode) stopAutoSkip();
     if(state.typing){finishType();return;}
-    if(window.AudioSys)AudioSys.sfxClick();
     advanceLine();
   }
 
@@ -408,7 +406,6 @@
       btn.innerHTML=`${escapeHTML(c.text)}<div class="choice-hint">${escapeHTML(c.hint||"")}</div>`;
       btn.addEventListener("click",(e)=>{
         e.stopPropagation();
-        if(window.AudioSys)AudioSys.sfxSelect();
         if(IS_TOUCH){
           state.readChoiceKeys.add(choiceKey(idx));
           persistRead();
@@ -481,7 +478,6 @@
           puzzleState.picked.push(clue.id);
           card.classList.add("picked");
         }
-        if(window.AudioSys)AudioSys.sfxSelect();
         fillSlots();
         updateSubmitState();
       });
@@ -496,7 +492,6 @@
     puzzleLayer.classList.remove("hidden");
     puzzleLayer.scrollTop=0;
     board.scrollTop=0;
-    if(window.AudioSys)AudioSys.playBGM("tense");
   }
 
   function fillSlots(){
@@ -570,7 +565,6 @@
         const c=conf.clues.find(cl=>cl.id===id);
         return c ? `<div class="success-reveal-item">${escapeHTML(c.reveal)}</div>`:"";
       }).join("");
-      if(window.AudioSys)AudioSys.sfxSuccess();
       setTimeout(()=>{
         $("puzzle-success").classList.remove("hidden");
       },350);
@@ -579,7 +573,6 @@
       slots.forEach(s=>s.classList.add("wrong"));
       const wrong=puzzleState.picked.find(id=>!correctIds.includes(id));
       const wc=conf.clues.find(c=>c.id===wrong);
-      if(window.AudioSys)AudioSys.sfxError();
       showPuzzleFail("其中混入了寻常之物——"+(wc?wc.name+"："+wc.reveal:"再想想，哪一处带着人为的痕迹。"));
       setTimeout(()=>{
         puzzleState.picked=[];
@@ -646,7 +639,6 @@
     $("title-screen").classList.add("hidden");
     state.aff=0;affVal.textContent="0";
     state.history=[];
-    if(window.AudioSys){AudioSys.resume();AudioSys.playBGM("calm");}
     gotoNode("intro_modern");
   }
   function backToTitle(){
@@ -655,7 +647,6 @@
     puzzleLayer.classList.add("hidden");closeBacklog();closeSettings();clearSprites();
     bgA.classList.remove("show");bgB.classList.remove("show");
     $("title-screen").classList.remove("hidden");
-    if(window.AudioSys)AudioSys.playBGM("title");
   }
 
   function bind(){
@@ -681,24 +672,6 @@
     $("q-skip").addEventListener("click",toggleSkip);
     $("q-settings").addEventListener("click",openSettings);
 
-    /* 游戏菜单开关 */
-    const menuEl=$("game-menu"),trigger=$("menu-trigger");
-    function closeMenu(){menuEl.classList.remove("show");trigger.classList.remove("active");}
-    function toggleMenu(){
-      if(menuEl.classList.contains("show")){closeMenu();}
-      else{menuEl.classList.add("show");trigger.classList.add("active");}
-    }
-    trigger.addEventListener("click",toggleMenu);
-    $("btn-menu-close").addEventListener("click",closeMenu);
-    menuEl.querySelector(".game-menu-mask").addEventListener("click",closeMenu);
-    /* 点菜单项时自动关闭菜单（回标题/存档等弹层类除外，由各自逻辑处理） */
-    menuEl.querySelectorAll(".gm-item").forEach(b=>{
-      b.addEventListener("click",()=>{
-        if(b.id==="q-settings"||b.id==="q-save"||b.id==="q-load"){setTimeout(closeMenu,120);}
-        else{setTimeout(closeMenu,80);}
-      });
-    });
-
     $("btn-backlog-close").addEventListener("click",closeBacklog);
     $("btn-settings-close").addEventListener("click",closeSettings);
     $("btn-settings-reset").addEventListener("click",()=>{
@@ -720,14 +693,6 @@
       settings.autoDelay=Number(e.target.value);
       persistSettings();
     });
-    if(window.AudioSys){
-      $("setting-bgm").addEventListener("input",(e)=>{
-        AudioSys.setBgmVol(Number(e.target.value)/100);
-      });
-      $("setting-sfx").addEventListener("input",(e)=>{
-        AudioSys.setSfxVol(Number(e.target.value)/100);
-      });
-    }
 
     document.addEventListener("wheel",(e)=>{
       if(e.deltaY<0 && canAdvanceDialogue()) openBacklog();
@@ -746,75 +711,11 @@
     });
   }
 
-  /* 标题画面火星粒子 */
-  function initTitleParticles(){
-    const c=$("title-particles");if(!c)return;
-    const ctx=c.getContext("2d");
-    let W=c.width=window.innerWidth,H=c.height=window.innerHeight;
-    const particles=[];
-    const COUNT=45;
-    function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
-    window.addEventListener("resize",resize);
-    function spawn(){
-      return{
-        x:Math.random()*W,y:H+Math.random()*40,
-        vx:(Math.random()-.5)*.4,vy:-(.3+Math.random()*1.0),
-        r:1+Math.random()*2.2,
-        life:.4+Math.random()*.6,
-        maxLife:.4+Math.random()*.6,
-        hue:Math.random()<.7?25+(Math.random()*15):40+(Math.random()*20),
-      };
-    }
-    for(let i=0;i<COUNT;i++){const p=spawn();p.y=Math.random()*H;particles.push(p);}
-    let running=true;
-    function tick(){
-      if(!running)return;
-      ctx.clearRect(0,0,W,H);
-      for(let i=particles.length-1;i>=0;i--){
-        const p=particles[i];
-        p.x+=p.vx;p.y+=p.vy;p.vy*=.997;p.life-=.003;
-        if(p.life<=0||p.y<-10){particles[i]=spawn();continue;}
-        const a=Math.min(1,p.life/p.maxLife);
-        ctx.beginPath();
-        const grd=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*3);
-        grd.addColorStop(0,`hsla(${p.hue},90%,70%,${a*.9})`);
-        grd.addColorStop(.4,`hsla(${p.hue},85%,55%,${a*.5})`);
-        grd.addColorStop(1,`hsla(${p.hue},80%,40%,0)`);
-        ctx.fillStyle=grd;
-        ctx.arc(p.x,p.y,p.r*3,0,Math.PI*2);ctx.fill();
-        ctx.beginPath();
-        ctx.fillStyle=`hsla(${p.hue+10},100%,85%,${a})`;
-        ctx.arc(p.x,p.y,p.r*.6,0,Math.PI*2);ctx.fill();
-      }
-      requestAnimationFrame(tick);
-    }
-    tick();
-    return ()=>{running=false;};
-  }
-
   window.addEventListener("DOMContentLoaded",()=>{
     bind();
     $("setting-text-speed").value=80-state.speed;
     $("setting-auto-speed").value=settings.autoDelay;
     if(hasSave())$("btn-continue").style.opacity="1";
-    initTitleParticles();
-
-    /* 音频初始化 */
-    if(window.AudioSys){
-      AudioSys.loadSettings();
-      $("setting-bgm").value=Math.round(AudioSys.bgmVol*100);
-      $("setting-sfx").value=Math.round(AudioSys.sfxVol*100);
-      const firstInteract=()=>{
-        AudioSys.resume();
-        if(!$("title-screen").classList.contains("hidden")){
-          AudioSys.playBGM("title");
-        }
-        window.removeEventListener("pointerdown",firstInteract);
-        window.removeEventListener("keydown",firstInteract);
-      };
-      window.addEventListener("pointerdown",firstInteract,{once:false});
-      window.addEventListener("keydown",firstInteract,{once:false});
-    }
   });
 
 })();
