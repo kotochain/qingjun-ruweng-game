@@ -118,7 +118,7 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
 
 /* ---------------- 对话框 ---------------- */
 #dialogue-box{
-  position:absolute;left:50%;bottom:64px;transform:translateX(-50%);
+  position:absolute;left:50%;bottom:70px;transform:translateX(-50%);
   width:min(1040px,92vw);min-height:172px;z-index:15;
   padding:30px 42px 34px;
   background:
@@ -672,7 +672,7 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
   .backlog-item{grid-template-columns:1fr;gap:6px;}
 }
 @media (max-height:780px){
-  #dialogue-box{bottom:58px;min-height:150px;}
+  #dialogue-box{bottom:64px;min-height:150px;}
   .sprite-slot{height:88%;}
 }
 
@@ -691,14 +691,18 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
   .aff-val{font-size:16px;min-width:22px;}
   .hud-pov{font-size:11px;letter-spacing:.12em;padding:6px 12px;}
 
-  /* 立绘 - 竖屏放大上移，对话框自然遮挡下半部 */
-  .sprite-slot{height:92%;width:78%;transform:translateY(0) scale(.98);}
-  #slot-left{left:-12%;}
-  #slot-center{left:50%;margin-left:-39%;}
-  #slot-right{right:-12%;}
-  .sprite-slot.show{transform:translateY(-2%) scale(1);}
-  .sprite-slot.dim{transform:translateY(-2%) scale(.96);}
-  .sprite-slot::after{bottom:8%;height:28px;}
+  /* 立绘 - 竖屏放大上移，对话框自然遮挡下半部裙摆 */
+  .sprite-slot{
+    height:100%;width:90%;
+    transform:translateY(-26%) scale(1.2);
+    background-position:bottom center;
+  }
+  #slot-left{left:-22%;}
+  #slot-center{left:50%;margin-left:-45%;}
+  #slot-right{right:-22%;}
+  .sprite-slot.show{transform:translateY(-28%) scale(1.22);}
+  .sprite-slot.dim{transform:translateY(-28%) scale(1.18);}
+  .sprite-slot::after{bottom:30%;height:28px;}
 
   /* 底部工具栏 - 44px触摸尺寸 */
   #bottom-bar{
@@ -710,7 +714,7 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
 
   /* 对话框 */
   #dialogue-box{
-    left:50%;bottom:calc(56px + env(safe-area-inset-bottom, 0px));
+    left:50%;bottom:calc(68px + env(safe-area-inset-bottom, 0px));
     transform:translateX(-50%);
     width:calc(100vw - 12px);min-height:0;
     padding:16px 18px 22px;border-radius:10px;
@@ -736,7 +740,7 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
   .tc.bl::after,.tc.br::after{width:1px;height:10px;bottom:7px;}
   .tc.bl::before{left:7px;}.tc.bl::after{left:7px;}
   .tc.br::before{right:7px;}.tc.br::after{right:7px;}
-  .title-seal-stamp{width:46px;height:46px;right:24px;bottom:calc(24px + env(safe-area-inset-bottom,0px));font-size:26px;border-width:1.5px;border-radius:5px;}
+  .title-seal-stamp{width:46px;height:46px;right:52px;bottom:calc(46px + env(safe-area-inset-bottom,0px));font-size:26px;border-width:1.5px;border-radius:5px;}
   .title-divider::before,.title-divider::after{width:56px;}
   .td-dot{width:8px;height:8px;}
   .title-seal{font-size:11px;letter-spacing:.35em;margin-bottom:18px;padding-left:.35em;}
@@ -862,17 +866,24 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
 
 /* 小屏短高度手机（如iPhone SE） */
 @media (max-width:520px) and (max-height:720px){
-  .sprite-slot{height:90%;width:82%;}
-  #slot-center{margin-left:-41%;}
+  .sprite-slot{
+    height:100%;width:96%;
+    transform:translateY(-16%) scale(1.16);
+  }
+  #slot-center{margin-left:-48%;}
+  #slot-left{left:-26%;}
+  #slot-right{right:-26%;}
+  .sprite-slot.show{transform:translateY(-18%) scale(1.18);}
+  .sprite-slot.dim{transform:translateY(-18%) scale(1.14);}
   #bottom-bar{padding:5px 6px calc(5px + env(safe-area-inset-bottom,0px));gap:1px;}
   .bar-btn{width:40px;height:40px;font-size:14px;border-radius:8px;}
-  #dialogue-box{bottom:calc(50px + env(safe-area-inset-bottom,0px));padding:14px 14px 20px;}
+  #dialogue-box{bottom:calc(62px + env(safe-area-inset-bottom,0px));padding:14px 14px 20px;}
   #dialogue-text{font-size:15px;line-height:1.75;}
   .title-main{font-size:54px;}
   .title-sub{margin-top:10px;}
   .title-menu{margin-top:28px;gap:10px;}
   .menu-btn{width:190px;padding-top:12px;padding-bottom:12px;font-size:18px;}
-  .title-seal-stamp{width:40px;height:40px;font-size:22px;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));}
+  .title-seal-stamp{width:40px;height:40px;font-size:22px;right:44px;bottom:calc(36px + env(safe-area-inset-bottom,0px));}
   .chapter-title{font-size:32px;}
   /* 推理界面小屏 */
   #puzzle-layer{padding-top:max(38px,env(safe-area-inset-top,0px));padding-left:8px;padding-right:8px;}
