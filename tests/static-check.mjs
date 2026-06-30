@@ -47,6 +47,12 @@ assert(engine.includes("appendHistory"), "engine should append dialogue lines in
   "assets/bg_hall.jpg",
   "assets/bg_banquet.jpg",
   "assets/title.jpg",
+  "assets/clue_incense.png",
+  "assets/clue_guard.png",
+  "assets/clue_music.png",
+  "assets/clue_wine.png",
+  "assets/clue_moon.png",
+  "assets/clue_sister.png",
 ].forEach((path) => {
   assert(existsSync(join(root, path)), `${path} should exist`);
   assert(statSync(join(root, path)).size > 50_000, `${path} should be a real generated image, not a placeholder`);
@@ -54,6 +60,7 @@ assert(engine.includes("appendHistory"), "engine should append dialogue lines in
 
 assert(data.includes(".jpg"), "data.js should reference JPG backgrounds");
 assert(data.includes("_cut.png"), "sprite mapping should use transparent cutout PNGs");
+assert(data.includes("img:true"), "puzzle clues should use custom generated images");
 assert(!/assets\/[^"']+\.svg/.test(index + engine + css + data), "runtime files should not reference fallback SVG assets");
 
 const failed = checks.filter((item) => !item.ok);
