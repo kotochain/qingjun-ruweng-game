@@ -461,7 +461,10 @@
         ? `<img class="clue-icon-img" src="assets/clue_${escapeHTML(clue.id)}.png" alt="">`
         : `<span class="clue-icon">${escapeHTML(clue.icon||"❖")}</span>`;
       card.innerHTML=`<div class="clue-card-img-wrap">${iconHTML}</div>
-        <div class="clue-card-meta"><div class="clue-name">${escapeHTML(clue.name)}</div></div>`;
+        <div class="clue-card-meta">
+          <div class="clue-name">${escapeHTML(clue.name)}</div>
+          <div class="clue-text">${escapeHTML(clue.text)}</div>
+        </div>`;
       card.addEventListener("click",()=>{
         if(puzzleState.locked)return;
         const idx=puzzleState.picked.indexOf(clue.id);

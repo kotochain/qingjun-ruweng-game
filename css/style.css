@@ -234,7 +234,7 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
 
 #clue-board{
   display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:max-content;gap:14px;
-  max-width:780px;width:100%;padding-bottom:100px;
+  max-width:780px;width:100%;padding-bottom:140px;
   overflow-y:auto;-webkit-overflow-scrolling:touch;
   flex:1;align-content:start;
   scrollbar-width:none;
@@ -270,7 +270,7 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
   0%{transform:scale(0);}60%{transform:scale(1.25);}100%{transform:scale(1);}
 }
 .clue-card-img-wrap{
-  width:100%;aspect-ratio:1;flex-shrink:0;
+  width:100%;aspect-ratio:1.15;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
   background:linear-gradient(180deg,rgba(30,20,38,.5),rgba(12,8,16,.85));
   position:relative;
@@ -295,15 +295,21 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
   filter:drop-shadow(0 4px 14px rgba(0,0,0,.6)) drop-shadow(0 0 20px rgba(127,227,214,.35));
 }
 .clue-card-meta{
-  padding:8px 10px 10px;text-align:center;
+  padding:10px 12px 12px;text-align:center;
   border-top:1px solid rgba(232,196,121,.1);
   background:linear-gradient(180deg,rgba(20,14,26,0),rgba(10,6,14,.6));
 }
 .clue-name{
-  font-size:14px;font-weight:600;color:var(--paper);letter-spacing:.08em;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-size:15px;font-weight:600;color:var(--paper);letter-spacing:.06em;
+  margin-bottom:6px;
+}
+.clue-text{
+  font-size:12.5px;line-height:1.65;color:var(--paper-dim);
+  font-family:var(--font-sans);text-align:left;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;
 }
 .clue-card.picked .clue-name{color:var(--cyan);}
+.clue-card.picked .clue-text{color:rgba(200,220,218,.85);}
 
 /* dock 底部槽位 */
 #puzzle-dock{
@@ -659,46 +665,65 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
   /* 触摸设备单击即确认，去掉 armed 二次确认 */
   .choice-btn.armed::after{display:none;}
 
-  /* 推理界面 - 竖屏：2列大图卡片 + 底部dock */
+  /* 推理界面 - 竖屏：单列横排卡片，文字优先（图左文右） */
   #puzzle-layer{
-    padding:0 12px 0;
-    padding-top:max(48px,env(safe-area-inset-top,0px));
+    padding:0 10px 0;
+    padding-top:max(44px,env(safe-area-inset-top,0px));
   }
-  .puzzle-kicker{font-size:11px;letter-spacing:.3em;margin-bottom:6px;}
-  #puzzle-head{margin-bottom:14px;padding:0 4px;}
-  #puzzle-title{font-size:22px;letter-spacing:.12em;margin-bottom:6px;}
-  #puzzle-title::before,#puzzle-title::after{font-size:13px;margin:0 .3em;}
-  #puzzle-desc{font-size:13.5px;line-height:1.7;}
+  .puzzle-kicker{font-size:11px;letter-spacing:.3em;margin-bottom:4px;}
+  #puzzle-head{margin-bottom:12px;padding:0 4px;}
+  #puzzle-title{font-size:21px;letter-spacing:.1em;margin-bottom:4px;}
+  #puzzle-title::before,#puzzle-title::after{font-size:12px;margin:0 .25em;}
+  #puzzle-desc{font-size:13px;line-height:1.65;}
   #clue-board{
-    grid-template-columns:repeat(2,1fr);gap:10px;
-    padding-bottom:120px;max-width:100%;
+    grid-template-columns:1fr;gap:9px;
+    padding-bottom:124px;max-width:100%;
   }
-  .clue-card{border-radius:10px;}
-  .clue-card.picked{transform:translateY(-2px) scale(1.01);}
-  .clue-card.picked::after{top:6px;right:8px;width:20px;height:20px;line-height:20px;font-size:12px;}
-  .clue-card-meta{padding:8px 8px 10px;}
-  .clue-name{font-size:14px;letter-spacing:.05em;}
-  .clue-icon{font-size:42px;}
-  .clue-icon-img{width:70%;height:70%;}
+  .clue-card{
+    border-radius:10px;
+    flex-direction:row;align-items:stretch;
+  }
+  .clue-card.picked{transform:translateX(3px) scale(1);}
+  .clue-card.picked::after{top:8px;right:8px;width:20px;height:20px;line-height:20px;font-size:12px;}
+  .clue-card-img-wrap{
+    width:78px;min-width:78px;aspect-ratio:1;flex-shrink:0;
+  }
+  .clue-icon{font-size:36px;}
+  .clue-icon-img{width:78%;height:78%;}
+  .clue-card-meta{
+    flex:1;padding:10px 12px 10px 10px;text-align:left;
+    border-top:none;border-left:1px solid rgba(232,196,121,.1);
+    display:flex;flex-direction:column;justify-content:center;
+    background:linear-gradient(90deg,rgba(20,14,26,.4),rgba(10,6,14,.7));
+  }
+  .clue-name{
+    font-size:15px;letter-spacing:.04em;margin-bottom:4px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .clue-text{
+    font-size:12.5px;line-height:1.6;color:var(--paper-dim);
+    font-family:var(--font-sans);text-align:left;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  }
   #puzzle-dock{
     gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));
     flex-wrap:wrap;
   }
   .dock-label{font-size:11px;letter-spacing:.2em;width:100%;text-align:center;}
   #puzzle-slots{gap:12px;}
-  .slot{width:50px;height:50px;border-radius:10px;}
+  .slot{width:48px;height:48px;border-radius:10px;}
   .slot-num{font-size:13px;}
   #puzzle-submit{font-size:15px;padding:11px 28px;letter-spacing:.18em;}
   #puzzle-fail{
-    position:fixed;top:max(54px,calc(env(safe-area-inset-top,0px) + 46px));
+    position:fixed;top:max(50px,calc(env(safe-area-inset-top,0px) + 42px));
     left:50%;transform:translateX(-50%);
-    max-width:calc(100vw - 32px);padding:10px 18px;font-size:13px;
+    max-width:calc(100vw - 28px);padding:10px 16px;font-size:12.5px;
     line-height:1.5;border-radius:10px;z-index:20;white-space:normal;
   }
-  .puzzle-success-inner{max-width:100%;width:calc(100vw - 32px);padding:28px 22px 24px;border-radius:12px;}
-  .puzzle-success-title{font-size:17px;letter-spacing:.25em;margin-bottom:18px;}
-  .success-reveal-item{font-size:14.5px;line-height:1.8;padding:10px 0;}
-  #puzzle-next{margin-top:20px;padding:12px 36px;font-size:15px;}
+  .puzzle-success-inner{max-width:100%;width:calc(100vw - 28px);padding:26px 20px 22px;border-radius:12px;}
+  .puzzle-success-title{font-size:16px;letter-spacing:.22em;margin-bottom:16px;}
+  .success-reveal-item{font-size:14px;line-height:1.8;padding:10px 0;}
+  #puzzle-next{margin-top:18px;padding:12px 34px;font-size:15px;}
 
   /* 弹层 */
   .overlay{align-items:flex-start;padding-top:max(40px,env(safe-area-inset-top,0px));overflow-y:auto;-webkit-overflow-scrolling:touch;}
@@ -747,6 +772,23 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
   .title-main{font-size:54px;}
   .title-menu{margin-top:30px;gap:10px;}
   .menu-btn{width:190px;padding-top:12px;padding-bottom:12px;font-size:18px;}
-  #puzzle-layer{padding-top:max(40px,env(safe-area-inset-top,0px));}
   .chapter-title{font-size:32px;}
+  /* 推理界面小屏 */
+  #puzzle-layer{padding-top:max(38px,env(safe-area-inset-top,0px));padding-left:8px;padding-right:8px;}
+  #puzzle-head{margin-bottom:10px;}
+  #puzzle-title{font-size:19px;}
+  #puzzle-desc{font-size:12.5px;}
+  #clue-board{gap:8px;padding-bottom:118px;}
+  .clue-card-img-wrap{width:68px;min-width:68px;}
+  .clue-card-meta{padding:8px 10px;}
+  .clue-name{font-size:14px;margin-bottom:3px;}
+  .clue-text{font-size:12px;line-height:1.55;-webkit-line-clamp:2;}
+  #puzzle-dock{gap:8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));}
+  .dock-label{font-size:10px;}
+  #puzzle-slots{gap:10px;}
+  .slot{width:44px;height:44px;}
+  #puzzle-submit{font-size:14px;padding:10px 22px;}
+  .puzzle-success-inner{padding:22px 18px 20px;}
+  .puzzle-success-title{font-size:15px;margin-bottom:14px;}
+  .success-reveal-item{font-size:13.5px;line-height:1.75;}
 }
