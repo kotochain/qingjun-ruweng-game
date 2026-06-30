@@ -254,11 +254,11 @@ const STORY = {
 /* 背景与立绘资源映射（生成后的图片放在 assets/ 下） */
 const ASSETS = {
   bg:{
-    office:"assets/bg_office.png",
-    palace_night:"assets/bg_palace_night.png",
-    chihua_room:"assets/bg_room.png",
-    palace_hall:"assets/bg_hall.png",
-    banquet:"assets/bg_banquet.png"
+    office:"assets/bg_office.jpg",
+    palace_night:"assets/bg_palace_night.jpg",
+    chihua_room:"assets/bg_room.jpg",
+    palace_hall:"assets/bg_hall.jpg",
+    banquet:"assets/bg_banquet.jpg"
   },
   sprite:{
     qingye_normal:"assets/qingye_normal_cut.png",

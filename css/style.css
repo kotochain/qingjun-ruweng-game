@@ -43,8 +43,8 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
 #bg-vignette{
   position:absolute;inset:0;pointer-events:none;
   background:
-    radial-gradient(ellipse at 50% 40%,rgba(0,0,0,0) 40%,rgba(0,0,0,.55) 100%),
-    linear-gradient(to bottom,rgba(0,0,0,.25),rgba(0,0,0,0) 25%,rgba(0,0,0,0) 60%,rgba(0,0,0,.6));
+    radial-gradient(ellipse at 50% 42%,rgba(0,0,0,0) 55%,rgba(0,0,0,.35) 100%),
+    linear-gradient(to bottom,rgba(0,0,0,.18),rgba(0,0,0,0) 20%,rgba(0,0,0,0) 58%,rgba(0,0,0,.5));
 }
 
 /* ---------------- 立绘层 ---------------- */
@@ -286,8 +286,8 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
 }
 #title-bg::after{
   content:"";position:absolute;inset:0;
-  background-image:url("../assets/title.png");
-  background-size:cover;background-position:center;opacity:.5;mix-blend-mode:screen;
+  background-image:url("../assets/title.jpg");
+  background-size:cover;background-position:center;opacity:.45;mix-blend-mode:screen;
   animation:titleDrift 24s ease-in-out infinite alternate;
 }
 @keyframes titleDrift{from{transform:scale(1.04) translate(0,0);}to{transform:scale(1.12) translate(-2%,-2%);}}

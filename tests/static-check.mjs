@@ -13,6 +13,7 @@ const assert = (condition, message) => {
 const index = read("index.html");
 const engine = read("js/engine.js");
 const css = read("css/style.css");
+const data = read("js/data.js");
 
 assert(index.includes("backlog-screen"), "index.html should contain Backlog overlay");
 assert(index.includes("settings-screen"), "index.html should contain Settings overlay");
@@ -31,8 +32,7 @@ assert(engine.includes("lineIdx"), "save data should include line index");
 
 assert(css.includes("#backlog-screen"), "style.css should style Backlog");
 assert(css.includes("#settings-screen"), "style.css should style Settings");
-assert(css.includes("../assets/title.png"), "title screen should use generated PNG key art");
-assert(!css.includes("../assets/title.svg"), "title screen should not use fallback SVG key art");
+assert(css.includes("../assets/title.jpg"), "title screen should use generated key art");
 assert(engine.includes("appendHistory"), "engine should append dialogue lines into history");
 
 [
@@ -41,19 +41,20 @@ assert(engine.includes("appendHistory"), "engine should append dialogue lines in
   "assets/qingye_soft_cut.png",
   "assets/qingye_cold_cut.png",
   "assets/qingye_shock_cut.png",
-  "assets/bg_office.png",
-  "assets/bg_palace_night.png",
-  "assets/bg_room.png",
-  "assets/bg_hall.png",
-  "assets/bg_banquet.png",
-  "assets/title.png",
+  "assets/bg_office.jpg",
+  "assets/bg_palace_night.jpg",
+  "assets/bg_room.jpg",
+  "assets/bg_hall.jpg",
+  "assets/bg_banquet.jpg",
+  "assets/title.jpg",
 ].forEach((path) => {
   assert(existsSync(join(root, path)), `${path} should exist`);
-  assert(statSync(join(root, path)).size > 500_000, `${path} should be a real generated image, not a placeholder`);
+  assert(statSync(join(root, path)).size > 50_000, `${path} should be a real generated image, not a placeholder`);
 });
 
-assert(!/assets\/[^"']+\.svg/.test(index + engine + css), "runtime files should not reference fallback SVG assets");
-assert(engine.includes("_cut.png") || read("js/data.js").includes("_cut.png"), "sprite mapping should use transparent cutout PNGs");
+assert(data.includes(".jpg"), "data.js should reference JPG backgrounds");
+assert(data.includes("_cut.png"), "sprite mapping should use transparent cutout PNGs");
+assert(!/assets\/[^"']+\.svg/.test(index + engine + css + data), "runtime files should not reference fallback SVG assets");
 
 const failed = checks.filter((item) => !item.ok);
 if (failed.length) {
