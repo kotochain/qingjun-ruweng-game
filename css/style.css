@@ -143,12 +143,12 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
   border-radius:2px 0 0 0;pointer-events:none;
 }
 #speaker-tag{
-  position:absolute;top:-1px;left:24px;
-  padding:8px 24px 10px;border-radius:0 0 6px 6px;
-  background:linear-gradient(180deg,rgba(50,36,60,.95),rgba(30,22,40,.98));
+  position:absolute;top:0;left:44px;transform:translateY(-100%);
+  padding:8px 26px 10px;border-radius:6px 6px 0 0;
+  background:linear-gradient(180deg,rgba(50,36,60,.95),rgba(38,28,46,.92));
   border:1px solid rgba(232,196,121,.4);
-  border-top:none;
-  box-shadow:0 6px 16px rgba(0,0,0,.4);
+  border-bottom:none;
+  box-shadow:0 -4px 14px rgba(0,0,0,.3);
 }
 #speaker-name{font-size:18px;font-weight:600;letter-spacing:.12em;
   background:linear-gradient(180deg,#fff,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent;}
