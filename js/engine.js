@@ -60,6 +60,8 @@
         backlogList=$("backlog-list");
   let bgActive={el:bgA,other:bgB};
 
+  const IS_TOUCH = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
   function showToast(msg){
     toast.textContent=msg;toast.classList.remove("hidden");
     requestAnimationFrame(()=>toast.classList.add("show"));
@@ -404,6 +406,12 @@
       btn.innerHTML=`${escapeHTML(c.text)}<div class="choice-hint">${escapeHTML(c.hint||"")}</div>`;
       btn.addEventListener("click",(e)=>{
         e.stopPropagation();
+        if(IS_TOUCH){
+          state.readChoiceKeys.add(choiceKey(idx));
+          persistRead();
+          commitChoice(c);
+          return;
+        }
         if(state.armedChoice===btn){
           state.readChoiceKeys.add(choiceKey(idx));
           persistRead();
@@ -420,7 +428,7 @@
     const hint=document.createElement("div");
     hint.className="choice-hint";
     hint.style.marginTop="18px";
-    hint.textContent="点击选项浮起 · 再次点击落子";
+    hint.textContent=IS_TOUCH ? "点击选项即可落子" : "点击选项浮起 · 再次点击落子";
     choiceLayer.appendChild(hint);
     choiceLayer.classList.remove("hidden");
   }
@@ -574,6 +582,8 @@
   function bind(){
     dlgBox.addEventListener("click",onAdvanceClick);
     chapterCard.addEventListener("click",skipChapter);
+    $("bg-layer").addEventListener("click",onAdvanceClick);
+    $("sprite-layer").addEventListener("click",onAdvanceClick);
 
     $("btn-start").addEventListener("click",startGame);
     $("btn-continue").addEventListener("click",()=>{hasSave()?load():showToast("尚无存档，请先入局");});
