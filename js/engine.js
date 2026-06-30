@@ -628,6 +628,8 @@
     const data=loadJSON(SAVE_KEY,null);
     if(!data){showToast("尚无存档");return;}
     $("title-screen").classList.add("hidden");
+    $("quick-menu").classList.remove("hidden");
+    $("hud").classList.remove("hidden");
     state.aff=data.aff||0;affVal.textContent=state.aff;
     state.history=Array.isArray(data.history)?data.history:[];
     setPov(data.pov||"heroine");
@@ -637,6 +639,8 @@
 
   function startGame(){
     $("title-screen").classList.add("hidden");
+    $("quick-menu").classList.remove("hidden");
+    $("hud").classList.remove("hidden");
     state.aff=0;affVal.textContent="0";
     state.history=[];
     gotoNode("intro_modern");
@@ -646,6 +650,8 @@
     dlgBox.classList.add("hidden");choiceLayer.classList.add("hidden");
     puzzleLayer.classList.add("hidden");closeBacklog();closeSettings();clearSprites();
     bgA.classList.remove("show");bgB.classList.remove("show");
+    $("quick-menu").classList.add("hidden");
+    $("hud").classList.add("hidden");
     $("title-screen").classList.remove("hidden");
   }
 
@@ -664,13 +670,15 @@
     $("puzzle-next").addEventListener("click",continueAfterPuzzle);
     $("puzzle-slots").addEventListener("click",onSlotClick);
 
-    $("q-save").addEventListener("click",save);
-    $("q-load").addEventListener("click",load);
-    $("q-home").addEventListener("click",backToTitle);
-    $("q-backlog").addEventListener("click",openBacklog);
     $("q-auto").addEventListener("click",toggleAuto);
     $("q-skip").addEventListener("click",toggleSkip);
-    $("q-settings").addEventListener("click",openSettings);
+    $("q-menu").addEventListener("click",openSettings);
+
+    // 设置面板内的功能按钮
+    $("btn-save").addEventListener("click",()=>{save();closeSettings();});
+    $("btn-load").addEventListener("click",()=>{closeSettings();load();});
+    $("btn-backlog-open").addEventListener("click",()=>{closeSettings();openBacklog();});
+    $("btn-home").addEventListener("click",()=>{closeSettings();backToTitle();});
 
     $("btn-backlog-close").addEventListener("click",closeBacklog);
     $("btn-settings-close").addEventListener("click",closeSettings);
