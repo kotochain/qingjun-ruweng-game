@@ -434,3 +434,112 @@ body{font-family:var(--font-serif);color:var(--paper);user-select:none;}
   .sprite-slot{height:88%;}
   #quick-menu{bottom:196px;}
 }
+
+/* ---------------- 手机竖屏适配 ---------------- */
+@media (max-width:520px){
+  /* 顶部 HUD */
+  #hud{padding:12px 14px;gap:8px;}
+  .hud-affinity{padding:6px 12px 6px 10px;gap:6px;}
+  .aff-icon{font-size:13px;}
+  .aff-name{font-size:12px;letter-spacing:.06em;}
+  .aff-val{font-size:15px;min-width:22px;}
+  .hud-pov{font-size:11px;letter-spacing:.15em;padding:6px 12px;}
+
+  /* 立绘 - 竖屏下缩小避免被对话框截断 */
+  .sprite-slot{height:78%;width:56%;}
+  #slot-center{margin-left:-28%;}
+
+  /* 快捷菜单 - 缩小并贴边 */
+  #quick-menu{right:10px;bottom:calc(180px + env(safe-area-inset-bottom, 0px));gap:7px;}
+  .q-btn{width:36px;height:36px;font-size:13px;}
+  .q-btn::before,.q-btn::after{display:none;}
+
+  /* 对话框 */
+  #dialogue-box{
+    left:50%;bottom:calc(10px + env(safe-area-inset-bottom, 0px));
+    transform:translateX(-50%);
+    width:calc(100vw - 16px);min-height:0;
+    padding:20px 20px 26px;border-radius:8px;
+  }
+  #dialogue-box::before{height:3px;border-radius:8px 8px 0 0;}
+  #dialogue-box::after{left:10px;top:10px;width:14px;height:14px;}
+  #speaker-tag{left:20px;padding:6px 18px 8px;}
+  #speaker-name{font-size:15px;letter-spacing:.08em;}
+  #dialogue-text{font-size:17px;line-height:1.85;min-height:0;letter-spacing:.02em;}
+  #dialogue-text.narration{font-size:16px;line-height:1.8;}
+  #continue-hint{right:20px;bottom:12px;font-size:13px;}
+
+  /* 标题画面 */
+  .title-seal{font-size:11px;letter-spacing:.35em;margin-bottom:18px;padding-left:.35em;}
+  .title-main{font-size:62px;letter-spacing:.12em;padding-left:.12em;text-shadow:0 6px 40px rgba(232,196,121,.3);}
+  .title-sub{font-size:16px;letter-spacing:.28em;margin-top:12px;padding-left:.28em;}
+  .title-menu{margin-top:38px;gap:12px;}
+  .menu-btn{font-size:19px;letter-spacing:.3em;padding-left:.3em;width:210px;padding-top:13px;padding-bottom:13px;}
+  .menu-btn.ghost{font-size:15px;width:180px;letter-spacing:.22em;}
+  .title-foot{margin-top:36px;font-size:11px;letter-spacing:.06em;}
+
+  /* 章节卡 */
+  .chapter-sub{font-size:14px;letter-spacing:.35em;margin-bottom:14px;padding-left:.35em;}
+  .chapter-title{font-size:36px;letter-spacing:.08em;}
+  .chapter-pov{margin-top:14px;font-size:13px;letter-spacing:.15em;}
+  .chapter-title::before,.chapter-title::after{font-size:14px;margin:0 .3em;}
+
+  /* 选项 */
+  #choice-layer{gap:14px;padding:20px;}
+  .choice-prompt{font-size:14px;letter-spacing:.15em;margin-bottom:4px;}
+  .choice-btn{min-width:0;width:100%;max-width:100%;font-size:17px;padding:16px 22px;line-height:1.5;border-radius:8px;}
+  .choice-btn.armed::after{bottom:-22px;font-size:11px;letter-spacing:.15em;}
+
+  /* 推理界面 */
+  #puzzle-layer{padding:20px 14px;}
+  #puzzle-head{margin-bottom:18px;}
+  #puzzle-title{font-size:22px;letter-spacing:.12em;margin-bottom:8px;}
+  #puzzle-title::before,#puzzle-title::after{font-size:14px;margin:0 .3em;}
+  #puzzle-desc{font-size:14px;line-height:1.7;}
+  #clue-board{gap:10px;}
+  .clue-card{width:calc(50% - 5px);padding:14px 12px;}
+  .clue-icon{font-size:22px;margin-bottom:6px;}
+  .clue-name{font-size:15px;margin-bottom:6px;}
+  .clue-text{font-size:12px;line-height:1.55;}
+  #puzzle-foot{gap:16px;flex-wrap:wrap;justify-content:center;margin-top:10px;}
+  #puzzle-counter{font-size:12px;}
+  #puzzle-feedback{max-width:calc(100vw - 40px);padding:14px 20px;font-size:14px;line-height:1.6;bottom:calc(20px + env(safe-area-inset-bottom, 0px));}
+
+  /* 弹层 */
+  .overlay-card{padding:28px 24px;border-radius:10px;}
+  .overlay-card h2{font-size:21px;margin-bottom:14px;}
+  .overlay-card p{font-size:14px;line-height:1.75;margin-bottom:12px;}
+  .overlay-card p.dim{font-size:12px;}
+  .overlay-card .soft-btn{margin-top:18px;padding:12px 32px;font-size:16px;}
+  .system-card{padding:24px 20px 20px;}
+  .system-card h2{font-size:23px;}
+  .system-kicker{font-size:11px;letter-spacing:.25em;margin-bottom:6px;}
+  .round-close{width:34px;height:34px;font-size:20px;line-height:30px;}
+  .system-head{margin-bottom:14px;gap:14px;}
+  .setting-row{padding:14px 0;gap:10px;}
+  .setting-row label{font-size:16px;margin-bottom:6px;}
+  .setting-row p{font-size:12px;line-height:1.6;}
+  .setting-actions{margin-top:14px;gap:12px;}
+  .backlog-item{grid-template-columns:1fr;gap:4px;padding:12px 14px;margin-bottom:8px;}
+  .backlog-speaker{font-size:14px;}
+  .backlog-text{font-size:14px;line-height:1.75;}
+  .system-foot{font-size:11px;margin-top:12px;}
+
+  /* Toast */
+  #toast{top:60px;padding:10px 22px;font-size:13px;}
+
+  /* 按钮 */
+  .soft-btn{font-size:16px;padding:12px 32px;}
+}
+
+/* 小屏短高度手机（如iPhone SE） */
+@media (max-width:520px) and (max-height:720px){
+  .sprite-slot{height:72%;}
+  #quick-menu{bottom:calc(168px + env(safe-area-inset-bottom, 0px));gap:6px;}
+  .q-btn{width:34px;height:34px;font-size:12px;}
+  #dialogue-box{padding:18px 18px 22px;}
+  #dialogue-text{font-size:16px;line-height:1.75;}
+  .title-main{font-size:52px;}
+  .title-menu{margin-top:28px;gap:10px;}
+  .menu-btn{width:190px;padding-top:11px;padding-bottom:11px;font-size:18px;}
+}
