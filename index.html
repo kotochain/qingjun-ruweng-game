@@ -7,7 +7,7 @@
 <title>请君入瓮 · 烟花为聘</title>
 <link rel="preconnect" href="https://fonts.font.im">
 <link href="https://fonts.font.im/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=11">
+<link rel="stylesheet" href="css/style.css?v=13">
 </head>
 <body>
 <div id="app">
@@ -85,17 +85,40 @@
   <!-- 标题画面 -->
   <div id="title-screen">
     <div id="title-bg"></div>
+    <canvas id="title-particles"></canvas>
+    <div id="title-vline-left" class="title-vline"></div>
+    <div id="title-vline-right" class="title-vline"></div>
     <div id="title-content">
-      <div class="title-seal">东方剧制 · 互动改编</div>
-      <h1 class="title-main">请君入瓮</h1>
-      <div class="title-sub">烟花为聘 · 赤华篇</div>
-      <div class="title-menu">
-        <button class="menu-btn" id="btn-start">入 局</button>
-        <button class="menu-btn ghost" id="btn-continue">续 局</button>
-        <button class="menu-btn ghost" id="btn-about">关于此局</button>
+      <div class="title-seal">
+        <span class="seal-dot">◆</span>
+        <span>东 方 剧 制</span>
+        <span class="seal-dot">◆</span>
       </div>
-      <div class="title-foot">改编自剧本杀《请君入瓮》· 仅供同人互动体验</div>
+      <div class="title-main-wrap">
+        <div class="title-side left">烟 花 为 聘</div>
+        <h1 class="title-main">请君入瓮</h1>
+        <div class="title-side right">赤 华 之 章</div>
+      </div>
+      <div class="title-divider">
+        <span class="div-line"></span>
+        <span class="div-char">壹</span>
+        <span class="div-line"></span>
+      </div>
+      <div class="title-menu">
+        <button class="menu-btn primary" id="btn-start">
+          <span class="btn-ink">入 局</span>
+          <span class="btn-sub">— 开 始 新 局 —</span>
+        </button>
+        <button class="menu-btn" id="btn-continue">
+          <span class="btn-ink">续 局</span>
+        </button>
+        <button class="menu-btn" id="btn-about">
+          <span class="btn-ink">关 于 此 局</span>
+        </button>
+      </div>
+      <div class="title-foot">改 编 自 剧 本 杀 《 请 君 入 瓮 》 · 仅 供 同 人 互 动 体 验</div>
     </div>
+    <div class="title-stamp">瓮</div>
   </div>
 
   <!-- 关于弹层 -->
@@ -105,7 +128,7 @@
       <p>本作是以剧本杀《请君入瓮》为灵感的同人互动剧情体验，主线聚焦 <b>皇甫赤华</b> 与 <b>雍门清夜</b>。</p>
       <p>你将以穿书者「杜盈华」的身份醒在公主皇甫赤华的身体里，在权谋夜宴中周旋、试探、抉择。你的每一次选择，都会改变与清夜之间的<b>心意</b>，也会改写这局棋的走向。</p>
       <p class="dim">操作：点击推进对话 · 推理时点选线索再拼合 · 手机端选项单击即落子。</p>
-      <p class="dim" style="text-align:center;margin-top:18px;letter-spacing:.1em;opacity:.5;font-size:12px;">BUILD v12 · 线索重排版</p>
+      <p class="dim" style="text-align:center;margin-top:18px;letter-spacing:.1em;opacity:.5;font-size:12px;">BUILD v13 · 国风重做·BGM版</p>
       <button class="soft-btn" id="btn-about-close">明白了</button>
     </div>
   </div>
@@ -149,6 +172,20 @@
         </div>
         <input id="setting-auto-speed" type="range" min="400" max="2600" step="100">
       </div>
+      <div class="setting-row">
+        <div>
+          <label for="setting-bgm">背 景 音 乐</label>
+          <p>氛围BGM音量，首次点击页面后开始播放。</p>
+        </div>
+        <input id="setting-bgm" type="range" min="0" max="100" step="1">
+      </div>
+      <div class="setting-row">
+        <div>
+          <label for="setting-sfx">界 面 音 效</label>
+          <p>点击、选项出现、反馈等音效。</p>
+        </div>
+        <input id="setting-sfx" type="range" min="0" max="100" step="1">
+      </div>
       <div class="setting-actions">
         <button class="soft-btn cyan" id="btn-fullscreen">全屏切换</button>
         <button class="soft-btn" id="btn-settings-reset">恢复默认</button>
@@ -157,15 +194,30 @@
     </div>
   </div>
 
-  <!-- 设置/菜单按钮 -->
-  <div id="quick-menu">
-    <button class="q-btn" id="q-save" data-tip="存局">存</button>
-    <button class="q-btn" id="q-load" data-tip="读局">读</button>
-    <button class="q-btn" id="q-backlog" data-tip="回想">历</button>
-    <button class="q-btn" id="q-auto" data-tip="自动">自</button>
-    <button class="q-btn" id="q-skip" data-tip="跳过">跳</button>
-    <button class="q-btn" id="q-settings" data-tip="设置">设</button>
-    <button class="q-btn" id="q-home" data-tip="回标题">幕</button>
+  <!-- 侧边菜单按钮 -->
+  <button id="menu-trigger" class="menu-trigger" title="菜单">
+    <span></span><span></span><span></span>
+  </button>
+
+  <!-- 游戏内菜单面板 -->
+  <div id="game-menu" class="game-menu hidden">
+    <div class="game-menu-mask"></div>
+    <div class="game-menu-panel">
+      <div class="game-menu-head">
+        <span class="gm-seal">令</span>
+        <span class="gm-title">掌 局</span>
+        <button class="gm-close" id="btn-menu-close">×</button>
+      </div>
+      <div class="gm-list">
+        <button class="gm-item" id="q-save"><span class="gm-ico">存</span><span class="gm-label">存 局</span></button>
+        <button class="gm-item" id="q-load"><span class="gm-ico">读</span><span class="gm-label">读 局</span></button>
+        <button class="gm-item" id="q-backlog"><span class="gm-ico">历</span><span class="gm-label">回 想</span></button>
+        <button class="gm-item" id="q-auto"><span class="gm-ico">自</span><span class="gm-label">自 动</span></button>
+        <button class="gm-item" id="q-skip"><span class="gm-ico">跳</span><span class="gm-label">跳 过</span></button>
+        <button class="gm-item" id="q-settings"><span class="gm-ico">设</span><span class="gm-label">设 置</span></button>
+        <button class="gm-item danger" id="q-home"><span class="gm-ico">幕</span><span class="gm-label">回 标 题</span></button>
+      </div>
+    </div>
   </div>
 
   <!-- 提示气泡 -->
@@ -173,7 +225,8 @@
 
 </div>
 
-<script src="js/data.js?v=11"></script>
-<script src="js/engine.js?v=11"></script>
+<script src="js/data.js?v=13"></script>
+<script src="js/audio.js?v=13"></script>
+<script src="js/engine.js?v=13"></script>
 </body>
 </html>
