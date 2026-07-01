@@ -7,7 +7,7 @@
 <title>请君入瓮 · 烟花为聘</title>
 <link rel="preconnect" href="https://fonts.font.im">
 <link href="https://fonts.font.im/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=14">
+<link rel="stylesheet" href="css/style.css?v=15">
 </head>
 <body>
 <div id="app">
@@ -98,6 +98,7 @@
       <div class="title-menu">
         <button class="menu-btn" id="btn-start">入 局</button>
         <button class="menu-btn ghost" id="btn-continue">续 局</button>
+        <button class="menu-btn ghost" id="btn-chapter">章 节</button>
         <button class="menu-btn ghost" id="btn-about">关于此局</button>
       </div>
       <div class="title-foot">改编自剧本杀《请君入瓮》· 仅供同人互动体验</div>
@@ -111,8 +112,23 @@
       <p>本作是以剧本杀《请君入瓮》为灵感的同人互动剧情体验，主线聚焦 <b>皇甫赤华</b> 与 <b>雍门清夜</b>。</p>
       <p>你将以穿书者「杜盈华」的身份醒在公主皇甫赤华的身体里，在权谋夜宴中周旋、试探、抉择。你的每一次选择，都会改变与清夜之间的<b>心意</b>，也会改写这局棋的走向。</p>
       <p class="dim">操作：点击推进对话 · 推理时点选线索再拼合 · 手机端选项单击即落子。</p>
-      <p class="dim" style="text-align:center;margin-top:18px;letter-spacing:.1em;opacity:.5;font-size:12px;">BUILD v17 · 六槽存档系统上线</p>
+      <p class="dim" style="text-align:center;margin-top:18px;letter-spacing:.1em;opacity:.5;font-size:12px;">BUILD v18 · 章节跳转 + 音效BGM</p>
       <button class="soft-btn" id="btn-about-close">明白了</button>
+    </div>
+  </div>
+
+  <!-- 章节选择弹层 -->
+  <div id="chapter-screen" class="overlay hidden">
+    <div class="system-card chapter-card">
+      <div class="system-head">
+        <div>
+          <div class="system-kicker">CHAPTER</div>
+          <h2>章节选择</h2>
+        </div>
+        <button class="round-close" id="btn-chapter-close" title="关闭">×</button>
+      </div>
+      <div id="chapter-list" class="chapter-jump-list"></div>
+      <div class="system-foot">已体验过的章节可直接跳转 · 跳转将重置当前进度</div>
     </div>
   </div>
 
@@ -174,6 +190,20 @@
         </div>
         <input id="setting-auto-speed" type="range" min="400" max="2600" step="100">
       </div>
+      <div class="setting-row">
+        <div>
+          <label for="setting-sfx-vol">音效音量</label>
+          <p>点击、选项、翻页等操作音效。</p>
+        </div>
+        <input id="setting-sfx-vol" type="range" min="0" max="100" step="1">
+      </div>
+      <div class="setting-row">
+        <div>
+          <label for="setting-bgm-vol">BGM 音量</label>
+          <p>环境音乐，进入剧情时自动播放。</p>
+        </div>
+        <input id="setting-bgm-vol" type="range" min="0" max="100" step="1">
+      </div>
       <div class="setting-actions">
         <button class="soft-btn cyan" id="btn-fullscreen">全屏切换</button>
         <button class="soft-btn" id="btn-settings-reset">恢复默认</button>
@@ -199,6 +229,6 @@
 </div>
 
 <script src="js/data.js?v=12"></script>
-<script src="js/engine.js?v=15"></script>
+<script src="js/engine.js?v=16"></script>
 </body>
 </html>

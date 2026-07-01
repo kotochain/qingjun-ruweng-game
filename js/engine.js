@@ -22,21 +22,56 @@
     "rooftop_scene": "第二幕 · 屋顶剖白",
     "act2_end": "第二幕 · 终"
   };
+  // 章节锚点：每个章节的起始节点，用于快速跳转
+  const CHAPTER_ANCHORS = [
+    {node:"intro_modern",  label:"序章 · 穿越",     desc:"猝死醒来，已是公主之身"},
+    {node:"meet_qingye",   label:"第一幕 · 初遇",   desc:"府中初见，那位清贵公子"},
+    {node:"banquet_intro", label:"第一幕 · 宫宴",   desc:"上元夜宴，暗流涌动"},
+    {node:"act2_intro",    label:"第二幕 · 赐婚",   desc:"圣旨赐婚，风起东宫"},
+    {node:"cohabit_days",  label:"第二幕 · 假面",   desc:"婚后相处，试探与真心"},
+    {node:"night_visit",   label:"第二幕 · 夜雨",   desc:"夜雨同行，心意渐明"}
+  ];
   function chapterOf(nodeId){
     return CHAPTER_TITLES[nodeId] || (nodeId && nodeId.startsWith("qingye_pov") ? "视角 · 雍门清夜" : "剧情进行中");
   }
   function getSaves(){
     const raw=loadJSON(SAVE_KEY,null);
-    if(!raw||!Array.isArray(raw.slots)){
-      return {slots:new Array(SLOT_COUNT).fill(null),lastSlot:-1};
+    const emptySlots = () => new Array(SLOT_COUNT).fill(null);
+    if(!raw){
+      return {slots:emptySlots(),auto:null,lastSlot:-1,visited:[]};
     }
     // 兼容旧单槽存档
     if(raw.node && !raw.slots){
-      return {slots:[{node:raw.node,lineIdx:raw.lineIdx||0,aff:raw.aff||0,pov:raw.pov||"heroine",history:raw.history||[],ts:raw.ts||Date.now(),new:true},...new Array(SLOT_COUNT-1).fill(null)],lastSlot:0};
+      return {slots:[{node:raw.node,lineIdx:raw.lineIdx||0,aff:raw.aff||0,pov:raw.pov||"heroine",history:raw.history||[],ts:raw.ts||Date.now()},...emptySlots().slice(1)],auto:null,lastSlot:0,visited:[]};
     }
+    if(!Array.isArray(raw.slots)) raw.slots=emptySlots();
+    if(raw.slots.length<SLOT_COUNT) raw.slots = raw.slots.concat(emptySlots().slice(raw.slots.length));
+    if(!Array.isArray(raw.visited)) raw.visited=[];
     return raw;
   }
   function setSaves(data){ saveJSON(SAVE_KEY,data); }
+  function autoSave(){
+    if(!state.node) return;
+    const data=getSaves();
+    data.auto={
+      node:state.node,lineIdx:state.lineIdx,aff:state.aff,pov:state.pov,
+      history:state.history,ts:Date.now()
+    };
+    if(!data.visited.includes(state.node)) data.visited.push(state.node);
+    setSaves(data);
+  }
+  let _autoSaveT=null;
+  function scheduleAutoSave(){
+    clearTimeout(_autoSaveT);
+    _autoSaveT=setTimeout(autoSave, 800);
+  }
+  function markVisited(nodeId){
+    const data=getSaves();
+    if(!data.visited.includes(nodeId)){
+      data.visited.push(nodeId);
+      setSaves(data);
+    }
+  }
   let saveMode="save"; // save | load
   const READ_KEY = "qjrw_read_lines_v1";
   const CHOICE_KEY = "qjrw_read_choices_v1";
@@ -54,7 +89,9 @@
 
   const settings = Object.assign({
     textSpeed: 30,
-    autoDelay: 1100
+    autoDelay: 1100,
+    sfxVol: 0.6,
+    bgmVol: 0.35
   }, loadJSON(SETTINGS_KEY, {}));
 
   const state = {
@@ -94,6 +131,123 @@
 
   const IS_TOUCH = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
+  /* ============ 音频系统（Web Audio 合成，零外部资源） ============ */
+  let audioCtx = null;
+  let masterSfx, masterBgm;
+  let bgmNodes = null;
+  let currentBgmScene = null;
+  function ensureAudio(){
+    if(audioCtx) return;
+    try{
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      masterSfx = audioCtx.createGain();
+      masterSfx.gain.value = settings.sfxVol;
+      masterSfx.connect(audioCtx.destination);
+      masterBgm = audioCtx.createGain();
+      masterBgm.gain.value = 0;
+      masterBgm.connect(audioCtx.destination);
+    }catch(e){ audioCtx = null; }
+  }
+  function unlockAudio(){
+    ensureAudio();
+    if(audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+  }
+  function setSfxVol(v){
+    settings.sfxVol = v;
+    if(masterSfx) masterSfx.gain.value = v;
+    persistSettings();
+  }
+  function setBgmVol(v){
+    settings.bgmVol = v;
+    if(masterBgm) masterBgm.gain.linearRampToValueAtTime(v, audioCtx?audioCtx.currentTime+0.5:0);
+    persistSettings();
+  }
+  function beep({freq=600, dur=0.08, type="sine", vol=0.3, attack=0.005, release=0.05, sweepTo=null} = {}){
+    if(!audioCtx) return;
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t);
+    if(sweepTo) osc.frequency.exponentialRampToValueAtTime(sweepTo, t + dur);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur + release);
+    osc.connect(g).connect(masterSfx);
+    osc.start(t);
+    osc.stop(t + dur + release + 0.02);
+  }
+  function sfxClick(){ beep({freq:900, dur:0.03, type:"triangle", vol:0.18, release:0.04}); }
+  function sfxAdvance(){ beep({freq:520, dur:0.05, type:"sine", vol:0.15, release:0.06}); }
+  function sfxChoice(){ beep({freq:700, dur:0.08, type:"sine", vol:0.22, sweepTo:1100, release:0.1}); }
+  function sfxSave(){ beep({freq:660, dur:0.08, type:"sine", vol:0.22}); setTimeout(()=>beep({freq:880,dur:0.12,type:"sine",vol:0.2}),80); }
+  function sfxError(){ beep({freq:200, dur:0.12, type:"square", vol:0.15, release:0.08}); }
+  function sfxChapter(){
+    beep({freq:1320, dur:0.2, type:"sine", vol:0.15, release:0.3});
+    setTimeout(()=>beep({freq:1760,dur:0.25,type:"sine",vol:0.12,release:0.4}),150);
+    setTimeout(()=>beep({freq:2200,dur:0.4,type:"sine",vol:0.08,release:0.6}),360);
+  }
+  function sfxType(){ beep({freq:2400+Math.random()*400, dur:0.008, type:"square", vol:0.025, release:0.01}); }
+  const SCENE_BGM = {
+    "office":     {base:110.00},
+    "chihua_room":{base:130.81},
+    "qingye_garden":{base:146.83},
+    "palace_hall":{base:164.81},
+    "palace_night":{base:123.47},
+    "banquet":    {base:174.61}
+  };
+  function startBgm(scene){
+    if(!audioCtx) return;
+    if(currentBgmScene === scene) return;
+    stopBgm();
+    currentBgmScene = scene;
+    const cfg = SCENE_BGM[scene] || SCENE_BGM["palace_night"];
+    const t = audioCtx.currentTime;
+    const pad = audioCtx.createGain();
+    pad.gain.value = 0;
+    pad.gain.linearRampToValueAtTime(0.5, t + 2.5);
+    pad.connect(masterBgm);
+    const layers = [1, 1.5, 2].map(mult => {
+      const o = audioCtx.createOscillator();
+      o.type = "sine";
+      o.frequency.value = cfg.base * mult;
+      const lfo = audioCtx.createOscillator();
+      lfo.frequency.value = 0.07 + Math.random()*0.1;
+      const lfoGain = audioCtx.createGain();
+      lfoGain.gain.value = 2 + Math.random()*2;
+      lfo.connect(lfoGain).connect(o.frequency);
+      const g = audioCtx.createGain();
+      g.gain.value = 0.15 / mult;
+      o.connect(g).connect(pad);
+      o.start(); lfo.start();
+      return {o,lfo,g};
+    });
+    const chimeInt = setInterval(()=>{
+      if(currentBgmScene !== scene) return;
+      const notes = [cfg.base*4, cfg.base*5, cfg.base*6];
+      const n = notes[Math.floor(Math.random()*notes.length)];
+      beep({freq:n, dur:0.6, type:"sine", vol:0.05, release:1.2});
+    }, 5000 + Math.random()*4000);
+    bgmNodes = {pad, layers, chimeInt};
+    if(masterBgm.gain.value < settings.bgmVol - 0.01){
+      masterBgm.gain.cancelScheduledValues(t);
+      masterBgm.gain.linearRampToValueAtTime(settings.bgmVol, t + 2);
+    }
+  }
+  function stopBgm(){
+    if(!bgmNodes || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    bgmNodes.pad.gain.cancelScheduledValues(t);
+    bgmNodes.pad.gain.linearRampToValueAtTime(0, t + 1.2);
+    const n = bgmNodes;
+    setTimeout(()=>{
+      n.layers.forEach(l=>{try{l.o.stop();l.lfo.stop();}catch(e){}});
+      clearInterval(n.chimeInt);
+    }, 1400);
+    bgmNodes = null;
+    currentBgmScene = null;
+  }
+
   function showToast(msg){
     toast.textContent=msg;toast.classList.remove("hidden");
     requestAnimationFrame(()=>toast.classList.add("show"));
@@ -123,6 +277,7 @@
     next.classList.add("show");
     bgActive.el.classList.remove("show");
     bgActive={el:next,other:bgActive.el};
+    startBgm(key);
   }
 
   function clearSprites(){
@@ -260,10 +415,13 @@
 
     state.typing=true;
     let i=0;
+    let lastSfx=0;
     function step(){
       if(!state.typing)return;
       i++;
       dlgText.innerHTML=lineHTML(line, raw.slice(0,i));
+      const now=performance.now();
+      if(now-lastSfx>55){ sfxType(); lastSfx=now; }
       if(i<raw.length){
         state._t=setTimeout(step, punctuationDelay(raw[i-1]));
       }else{
@@ -341,6 +499,7 @@
   }
 
   function playChapter(ch, cb){
+    sfxChapter();
     $("chapter-sub").textContent=ch.sub||"";
     $("chapter-title").textContent=ch.title||"";
     $("chapter-pov").textContent=ch.pov||"";
@@ -365,6 +524,8 @@
     state.lineIdx=startLine || 0;
     const node=STORY[key];
     if(!node){console.warn("missing node",key);return;}
+    markVisited(key);
+    scheduleAutoSave();
 
     const enter=()=>{
       if(node.pov)setPov(node.pov);
@@ -413,8 +574,10 @@
   }
 
   function onAdvanceClick(){
+    unlockAudio();
     if(state.autoMode || state.skipMode) stopAutoSkip();
     if(state.typing){finishType();return;}
+    sfxAdvance();
     advanceLine();
   }
 
@@ -466,6 +629,7 @@
   }
 
   function commitChoice(c){
+    sfxChoice();
     choiceLayer.classList.add("hidden");
     choiceLayer.innerHTML="";
     state.armedChoice=null;
@@ -663,6 +827,33 @@
     const container=$("save-slots");
     container.innerHTML="";
     const data=getSaves();
+    // 自动存档槽
+    const autoEl=document.createElement("div");
+    autoEl.className="save-slot save-slot-auto"+(data.auto?"":" empty");
+    if(data.auto){
+      autoEl.innerHTML=`
+        <div class="save-slot-head">
+          <div class="save-slot-chapter">${chapterOf(data.auto.node)}</div>
+          <div class="save-slot-aff">AUTO</div>
+        </div>
+        <div class="save-slot-meta">自动存档 · ${fmtTime(data.auto.ts)} · ❤ ${data.auto.aff||0}</div>`;
+      autoEl.addEventListener("click",()=>{
+        if(saveMode==="save"){ showToast("自动存档由系统管理，无法手动写入"); return; }
+        sfxSave();
+        closeSavePanel();
+        $("title-screen").classList.add("hidden");
+        $("bottom-bar").classList.remove("hidden");
+        state.aff=data.auto.aff||0;affVal.textContent=state.aff;
+        state.history=Array.isArray(data.auto.history)?data.auto.history:[];
+        setPov(data.auto.pov||"heroine");
+        showToast("续局 · 自动存档");
+        gotoNode(data.auto.node||"intro_modern", data.auto.lineIdx||0);
+      });
+    }else{
+      autoEl.innerHTML=`<span>自动存档（暂无）</span>`;
+    }
+    container.appendChild(autoEl);
+    // 手动槽
     for(let i=0;i<SLOT_COUNT;i++){
       const slot=data.slots[i];
       const el=document.createElement("div");
@@ -704,20 +895,21 @@
     const data=getSaves();
     const slot=data.slots[i];
     if(saveMode==="save"){
-      // 保存
+      if(state.node==="title"){ showToast("请先入局再存档"); return; }
       const newSlot={
         node:state.node,lineIdx:state.lineIdx,aff:state.aff,pov:state.pov,
         history:state.history,ts:Date.now(),new:true
       };
-      if(slot && !confirm(`槽 ${i+1} 已有存档，确定覆盖吗？`)) return;
+      if(slot && !confirm(`槽 ${i+1} 已有存档，确定覆盖吗？`)){ sfxError(); return; }
       data.slots[i]=newSlot;
       data.lastSlot=i;
       setSaves(data);
+      sfxSave();
       showToast(`已存至槽 ${i+1}`);
       renderSaveSlots();
     }else{
-      // 读取
-      if(!slot){ showToast("此槽为空"); return; }
+      if(!slot){ sfxError(); showToast("此槽为空"); return; }
+      sfxSave();
       closeSavePanel();
       $("title-screen").classList.add("hidden");
       $("bottom-bar").classList.remove("hidden");
@@ -740,23 +932,29 @@
   function save(){ openSavePanel("save"); }
   function hasSave(){
     const data=getSaves();
-    return data.slots.some(s=>!!s);
+    return !!data.auto || data.slots.some(s=>!!s);
   }
   function load(){
-    if(!hasSave()){ showToast("尚无存档，请先入局"); return; }
+    if(!hasSave()){ sfxError(); showToast("尚无存档，请先入局"); return; }
     openSavePanel("load");
   }
   function quickContinue(){
     const data=getSaves();
-    const idx=data.lastSlot>=0?data.lastSlot:data.slots.findIndex(s=>!!s);
-    if(idx<0){ showToast("尚无存档，请先入局"); return; }
-    const slot=data.slots[idx];
+    // 优先读 auto，其次 lastSlot，再其次第一个非空槽
+    let slot=data.auto, label="自动存档";
+    if(!slot){
+      const idx=data.lastSlot>=0?data.lastSlot:data.slots.findIndex(s=>!!s);
+      if(idx<0){ sfxError(); showToast("尚无存档，请先入局"); return; }
+      slot=data.slots[idx];
+      label=`槽 ${idx+1}`;
+    }
     $("title-screen").classList.add("hidden");
     $("bottom-bar").classList.remove("hidden");
     state.aff=slot.aff||0;affVal.textContent=state.aff;
     state.history=Array.isArray(slot.history)?slot.history:[];
     setPov(slot.pov||"heroine");
-    showToast(`续局 · 槽 ${idx+1}`);
+    sfxSave();
+    showToast(`续局 · ${label}`);
     gotoNode(slot.node||"intro_modern", slot.lineIdx||0);
   }
 
@@ -768,12 +966,65 @@
     gotoNode("intro_modern");
   }
   function backToTitle(){
-    stopAutoSkip();
+    stopAutoSkip();stopBgm();
     dlgBox.classList.add("hidden");choiceLayer.classList.add("hidden");
-    puzzleLayer.classList.add("hidden");closeBacklog();closeSettings();closeSavePanel();clearSprites();
+    puzzleLayer.classList.add("hidden");closeBacklog();closeSettings();closeSavePanel();closeChapterPanel();clearSprites();
     bgA.classList.remove("show");bgB.classList.remove("show");
     $("title-screen").classList.remove("hidden");
     $("bottom-bar").classList.add("hidden");
+    refreshChapterBtn();
+  }
+
+  /* ============ 章节快速跳转 ============ */
+  function isChapterUnlocked(anchorNode){
+    if(anchorNode==="intro_modern") return true;
+    const data=getSaves();
+    const visited=data.visited||[];
+    const idx=CHAPTER_ANCHORS.findIndex(a=>a.node===anchorNode);
+    if(idx<=0) return true;
+    const prev=CHAPTER_ANCHORS[idx-1];
+    return visited.includes(prev.node);
+  }
+  function openChapterPanel(){
+    stopAutoSkip();
+    renderChapterList();
+    $("chapter-screen").classList.remove("hidden");
+  }
+  function closeChapterPanel(){ $("chapter-screen")?.classList.add("hidden"); }
+  function renderChapterList(){
+    const list=$("chapter-list");
+    if(!list) return;
+    list.innerHTML="";
+    CHAPTER_ANCHORS.forEach(a=>{
+      const unlocked=isChapterUnlocked(a.node);
+      const el=document.createElement("div");
+      el.className="chapter-jump-item"+(unlocked?"":" locked");
+      el.innerHTML=`
+        <div class="chapter-jump-label">${escapeHTML(a.label)}</div>
+        <div class="chapter-jump-desc">${unlocked?escapeHTML(a.desc):"？？？ 尚未解锁"}</div>
+        <div class="chapter-jump-mark">${unlocked?"◆":"◇"}</div>`;
+      if(unlocked){
+        el.addEventListener("click",()=>{
+          sfxChapter();
+          closeChapterPanel();
+          $("title-screen").classList.add("hidden");
+          $("bottom-bar").classList.remove("hidden");
+          state.aff=0;affVal.textContent="0";
+          state.history=[];
+          setPov("heroine");
+          showToast(`跳转 · ${a.label}`);
+          gotoNode(a.node,0);
+        });
+      }
+      list.appendChild(el);
+    });
+  }
+  function refreshChapterBtn(){
+    const btn=$("btn-chapter");
+    if(!btn) return;
+    const data=getSaves();
+    const anyVisited=(data.visited||[]).length>0;
+    btn.style.opacity=anyVisited?"1":"0.5";
   }
 
   function bind(){
@@ -782,10 +1033,15 @@
     $("bg-layer").addEventListener("click",onAdvanceClick);
     $("sprite-layer").addEventListener("click",onAdvanceClick);
 
-    $("btn-start").addEventListener("click",startGame);
-    $("btn-continue").addEventListener("click",quickContinue);
+    $("btn-start").addEventListener("click",()=>{unlockAudio();startGame();});
+    $("btn-continue").addEventListener("click",()=>{unlockAudio();quickContinue();});
     $("btn-about").addEventListener("click",()=>$("about-screen").classList.remove("hidden"));
     $("btn-about-close").addEventListener("click",()=>$("about-screen").classList.add("hidden"));
+    $("btn-chapter").addEventListener("click",()=>{unlockAudio();openChapterPanel();});
+    $("btn-chapter-close").addEventListener("click",closeChapterPanel);
+    $("chapter-screen")?.addEventListener("click",(ev)=>{
+      if(ev.target.id==="chapter-screen") closeChapterPanel();
+    });
 
     // 存档面板
     $("btn-save-close").addEventListener("click",closeSavePanel);
@@ -818,8 +1074,12 @@
     $("btn-settings-close").addEventListener("click",closeSettings);
     $("btn-settings-reset").addEventListener("click",()=>{
       state.speed=30;settings.autoDelay=1100;
+      settings.sfxVol=0.6;settings.bgmVol=0.35;
       $("setting-text-speed").value=50;
       $("setting-auto-speed").value=1100;
+      if($("setting-sfx-vol")) $("setting-sfx-vol").value=60;
+      if($("setting-bgm-vol")) $("setting-bgm-vol").value=35;
+      setSfxVol(0.6);setBgmVol(0.35);
       persistSettings();
       showToast("设置已恢复");
     });
@@ -835,13 +1095,27 @@
       settings.autoDelay=Number(e.target.value);
       persistSettings();
     });
+    const sfxSlider=$("setting-sfx-vol");
+    const bgmSlider=$("setting-bgm-vol");
+    if(sfxSlider){
+      sfxSlider.value=Math.round(settings.sfxVol*100);
+      sfxSlider.addEventListener("input",(e)=>{
+        setSfxVol(Number(e.target.value)/100);
+      });
+    }
+    if(bgmSlider){
+      bgmSlider.value=Math.round(settings.bgmVol*100);
+      bgmSlider.addEventListener("input",(e)=>{
+        setBgmVol(Number(e.target.value)/100);
+      });
+    }
 
     document.addEventListener("wheel",(e)=>{
       if(e.deltaY<0 && canAdvanceDialogue()) openBacklog();
     },{passive:true});
 
     document.addEventListener("keydown",(e)=>{
-      if(e.code==="Escape"){closeBacklog();closeSettings();closeSavePanel();return;}
+      if(e.code==="Escape"){closeBacklog();closeSettings();closeSavePanel();closeChapterPanel();return;}
       if(e.code==="PageUp" || e.key.toLowerCase()==="b"){openBacklog();return;}
       if(e.key.toLowerCase()==="a"){toggleAuto();return;}
       if(e.key.toLowerCase()==="s"){toggleSkip();return;}
@@ -858,6 +1132,7 @@
     $("setting-text-speed").value=80-state.speed;
     $("setting-auto-speed").value=settings.autoDelay;
     if(hasSave())$("btn-continue").style.opacity="1";
+    refreshChapterBtn();
   });
 
 })();
