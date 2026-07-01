@@ -602,9 +602,9 @@
     const ov=document.createElement("div");
     ov.className="overlay";
     ov.innerHTML=`<div class="overlay-card" style="text-align:center">
-      <h2>第一幕 · 终</h2>
+      <h2>第二幕 · 终</h2>
       <p>你与雍门清夜的「心意」停在 <b style="color:var(--rose)">${state.aff}</b>。</p>
-      <p class="dim">这只是这口瓮的开端。第二幕「史密斯夫妇式对峙」、第三幕「烟花为聘」的多结局，正在路上。</p>
+      <p class="dim">上元灯节、烟花宴、太子与景澄的棋局、以及清夜藏了十年的那笔血债——都将在第三幕「烟花为聘」中落下帷幕。</p>
       <button class="soft-btn" id="end-back">回到标题</button>
     </div>`;
     document.body.appendChild(ov);
