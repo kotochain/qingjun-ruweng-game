@@ -980,10 +980,7 @@
     if(anchorNode==="intro_modern") return true;
     const data=getSaves();
     const visited=data.visited||[];
-    const idx=CHAPTER_ANCHORS.findIndex(a=>a.node===anchorNode);
-    if(idx<=0) return true;
-    const prev=CHAPTER_ANCHORS[idx-1];
-    return visited.includes(prev.node);
+    return visited.includes(anchorNode);
   }
   function openChapterPanel(){
     stopAutoSkip();
