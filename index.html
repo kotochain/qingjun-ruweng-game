@@ -111,8 +111,27 @@
       <p>本作是以剧本杀《请君入瓮》为灵感的同人互动剧情体验，主线聚焦 <b>皇甫赤华</b> 与 <b>雍门清夜</b>。</p>
       <p>你将以穿书者「杜盈华」的身份醒在公主皇甫赤华的身体里，在权谋夜宴中周旋、试探、抉择。你的每一次选择，都会改变与清夜之间的<b>心意</b>，也会改写这局棋的走向。</p>
       <p class="dim">操作：点击推进对话 · 推理时点选线索再拼合 · 手机端选项单击即落子。</p>
-      <p class="dim" style="text-align:center;margin-top:18px;letter-spacing:.1em;opacity:.5;font-size:12px;">BUILD v16 · 第二幕「假面夫妻」完整上线</p>
+      <p class="dim" style="text-align:center;margin-top:18px;letter-spacing:.1em;opacity:.5;font-size:12px;">BUILD v17 · 六槽存档系统上线</p>
       <button class="soft-btn" id="btn-about-close">明白了</button>
+    </div>
+  </div>
+
+  <!-- 存档/读档面板 -->
+  <div id="save-screen" class="overlay hidden">
+    <div class="system-card save-card">
+      <div class="system-head">
+        <div>
+          <div class="system-kicker" id="save-kicker">SAVE</div>
+          <h2 id="save-title">存 局</h2>
+        </div>
+        <button class="round-close" id="btn-save-close" title="关闭">×</button>
+      </div>
+      <div class="save-tabs">
+        <button class="save-tab active" data-tab="save">存 局</button>
+        <button class="save-tab" data-tab="load">读 局</button>
+      </div>
+      <div id="save-slots" class="save-slots"></div>
+      <div class="system-foot">点击空槽存档 · 点击已有槽读取 · 长按槽位可删除</div>
     </div>
   </div>
 
@@ -180,6 +199,6 @@
 </div>
 
 <script src="js/data.js?v=12"></script>
-<script src="js/engine.js?v=14"></script>
+<script src="js/engine.js?v=15"></script>
 </body>
 </html>

@@ -27,8 +27,11 @@ assert(engine.includes("renderBacklog"), "engine should render Backlog");
 assert(engine.includes("toggleAuto"), "engine should implement Auto mode");
 assert(engine.includes("toggleSkip"), "engine should implement Skip mode");
 assert(engine.includes("readLineKeys"), "engine should persist/read already-read line keys");
-assert(engine.includes("gotoNode(data.node"), "load should resume from saved node");
+assert(engine.includes("SLOT_COUNT"), "engine should support multi-slot save");
+assert(engine.includes("openSavePanel"), "engine should open save/load panel");
+assert(engine.includes("gotoNode(slot.node"), "engine should resume from slot's saved node");
 assert(engine.includes("lineIdx"), "save data should include line index");
+assert(engine.includes("renderSaveSlots"), "engine should render save slot grid");
 
 assert(css.includes("#backlog-screen"), "style.css should style Backlog");
 assert(css.includes("#settings-screen"), "style.css should style Settings");

@@ -6,6 +6,38 @@
 
   const $ = id => document.getElementById(id);
   const SAVE_KEY = "qjrw_save_v2";
+  const SLOT_COUNT = 6;
+  const CHAPTER_TITLES = {
+    "intro_modern": "序章 · 加班猝死",
+    "awaken": "序章 · 穿越",
+    "meet_qingye": "第一幕 · 初遇",
+    "banquet_intro": "第一幕 · 宫宴风云",
+    "puzzle_banquet": "第一幕 · 查案",
+    "act1_end": "第一幕 · 终",
+    "act2_intro": "第二幕 · 赐婚",
+    "wedding_night": "第二幕 · 花烛夜",
+    "cohabit_days": "第二幕 · 假面夫妻",
+    "letter_from_palace": "第二幕 · 父皇密令",
+    "night_visit": "第二幕 · 夜雨同行",
+    "rooftop_scene": "第二幕 · 屋顶剖白",
+    "act2_end": "第二幕 · 终"
+  };
+  function chapterOf(nodeId){
+    return CHAPTER_TITLES[nodeId] || (nodeId && nodeId.startsWith("qingye_pov") ? "视角 · 雍门清夜" : "剧情进行中");
+  }
+  function getSaves(){
+    const raw=loadJSON(SAVE_KEY,null);
+    if(!raw||!Array.isArray(raw.slots)){
+      return {slots:new Array(SLOT_COUNT).fill(null),lastSlot:-1};
+    }
+    // 兼容旧单槽存档
+    if(raw.node && !raw.slots){
+      return {slots:[{node:raw.node,lineIdx:raw.lineIdx||0,aff:raw.aff||0,pov:raw.pov||"heroine",history:raw.history||[],ts:raw.ts||Date.now(),new:true},...new Array(SLOT_COUNT-1).fill(null)],lastSlot:0};
+    }
+    return raw;
+  }
+  function setSaves(data){ saveJSON(SAVE_KEY,data); }
+  let saveMode="save"; // save | load
   const READ_KEY = "qjrw_read_lines_v1";
   const CHOICE_KEY = "qjrw_read_choices_v1";
   const SETTINGS_KEY = "qjrw_settings_v1";
@@ -611,29 +643,121 @@
     $("end-back").addEventListener("click",()=>{ov.remove();backToTitle();});
   }
 
-  function save(){
-    const data={
-      node:state.node,
-      lineIdx:state.lineIdx,
-      aff:state.aff,
-      pov:state.pov,
-      history:state.history,
-      ts:Date.now()
-    };
-    try{saveJSON(SAVE_KEY,data);showToast("此局已存");}
-    catch(e){showToast("存档失败");}
+  function fmtTime(ts){
+    const d=new Date(ts);
+    const pad=n=>String(n).padStart(2,"0");
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
-  function hasSave(){return !!localStorage.getItem(SAVE_KEY);}
+  function openSavePanel(mode){
+    saveMode=mode;
+    $("save-kicker").textContent=mode==="save"?"SAVE":"LOAD";
+    $("save-title").textContent=mode==="save"?"存 局":"读 局";
+    document.querySelectorAll(".save-tab").forEach(t=>{
+      t.classList.toggle("active", t.dataset.tab===mode);
+    });
+    renderSaveSlots();
+    $("save-screen").classList.remove("hidden");
+  }
+  function closeSavePanel(){ $("save-screen").classList.add("hidden"); }
+  function renderSaveSlots(){
+    const container=$("save-slots");
+    container.innerHTML="";
+    const data=getSaves();
+    for(let i=0;i<SLOT_COUNT;i++){
+      const slot=data.slots[i];
+      const el=document.createElement("div");
+      el.className="save-slot"+(slot?"":" empty");
+      el.dataset.idx=i;
+      if(!slot){
+        el.innerHTML=`<span>空 槽 ${i+1}</span>`;
+        el.addEventListener("click",()=>onSlotClickAction(i));
+        container.appendChild(el);
+        continue;
+      }
+      const ch=chapterOf(slot.node);
+      const isNew=slot.new;
+      el.innerHTML=`
+        ${isNew?'<div class="save-slot-new">NEW</div>':""}
+        <button class="save-slot-del" data-del="${i}" title="删除">×</button>
+        <div class="save-slot-head">
+          <div class="save-slot-chapter">${ch}</div>
+          <div class="save-slot-aff">❤ ${slot.aff||0}</div>
+        </div>
+        <div class="save-slot-meta">槽 ${i+1} · ${fmtTime(slot.ts)}</div>`;
+      el.addEventListener("click",(ev)=>{
+        if(ev.target.closest(".save-slot-del")) return;
+        onSlotClickAction(i);
+      });
+      el.querySelector(".save-slot-del").addEventListener("click",(ev)=>{
+        ev.stopPropagation();
+        onSlotDelete(i);
+      });
+      container.appendChild(el);
+    }
+    // 去掉上一次的new标记（只显示一次）
+    if(data.slots.some(s=>s&&s.new)){
+      data.slots.forEach(s=>{ if(s) s.new=false; });
+      setSaves(data);
+    }
+  }
+  function onSlotClickAction(i){
+    const data=getSaves();
+    const slot=data.slots[i];
+    if(saveMode==="save"){
+      // 保存
+      const newSlot={
+        node:state.node,lineIdx:state.lineIdx,aff:state.aff,pov:state.pov,
+        history:state.history,ts:Date.now(),new:true
+      };
+      if(slot && !confirm(`槽 ${i+1} 已有存档，确定覆盖吗？`)) return;
+      data.slots[i]=newSlot;
+      data.lastSlot=i;
+      setSaves(data);
+      showToast(`已存至槽 ${i+1}`);
+      renderSaveSlots();
+    }else{
+      // 读取
+      if(!slot){ showToast("此槽为空"); return; }
+      closeSavePanel();
+      $("title-screen").classList.add("hidden");
+      $("bottom-bar").classList.remove("hidden");
+      state.aff=slot.aff||0;affVal.textContent=state.aff;
+      state.history=Array.isArray(slot.history)?slot.history:[];
+      setPov(slot.pov||"heroine");
+      showToast(`读取槽 ${i+1}`);
+      gotoNode(slot.node||"intro_modern", slot.lineIdx||0);
+    }
+  }
+  function onSlotDelete(i){
+    const data=getSaves();
+    if(!data.slots[i]) return;
+    if(!confirm(`确定删除槽 ${i+1} 的存档吗？`)) return;
+    data.slots[i]=null;
+    if(data.lastSlot===i) data.lastSlot=data.slots.findIndex(s=>!!s);
+    setSaves(data);
+    renderSaveSlots();
+  }
+  function save(){ openSavePanel("save"); }
+  function hasSave(){
+    const data=getSaves();
+    return data.slots.some(s=>!!s);
+  }
   function load(){
-    const data=loadJSON(SAVE_KEY,null);
-    if(!data){showToast("尚无存档");return;}
+    if(!hasSave()){ showToast("尚无存档，请先入局"); return; }
+    openSavePanel("load");
+  }
+  function quickContinue(){
+    const data=getSaves();
+    const idx=data.lastSlot>=0?data.lastSlot:data.slots.findIndex(s=>!!s);
+    if(idx<0){ showToast("尚无存档，请先入局"); return; }
+    const slot=data.slots[idx];
     $("title-screen").classList.add("hidden");
     $("bottom-bar").classList.remove("hidden");
-    state.aff=data.aff||0;affVal.textContent=state.aff;
-    state.history=Array.isArray(data.history)?data.history:[];
-    setPov(data.pov||"heroine");
-    showToast("续局");
-    gotoNode(data.node||"intro_modern", data.lineIdx||0);
+    state.aff=slot.aff||0;affVal.textContent=state.aff;
+    state.history=Array.isArray(slot.history)?slot.history:[];
+    setPov(slot.pov||"heroine");
+    showToast(`续局 · 槽 ${idx+1}`);
+    gotoNode(slot.node||"intro_modern", slot.lineIdx||0);
   }
 
   function startGame(){
@@ -646,7 +770,7 @@
   function backToTitle(){
     stopAutoSkip();
     dlgBox.classList.add("hidden");choiceLayer.classList.add("hidden");
-    puzzleLayer.classList.add("hidden");closeBacklog();closeSettings();clearSprites();
+    puzzleLayer.classList.add("hidden");closeBacklog();closeSettings();closeSavePanel();clearSprites();
     bgA.classList.remove("show");bgB.classList.remove("show");
     $("title-screen").classList.remove("hidden");
     $("bottom-bar").classList.add("hidden");
@@ -659,9 +783,24 @@
     $("sprite-layer").addEventListener("click",onAdvanceClick);
 
     $("btn-start").addEventListener("click",startGame);
-    $("btn-continue").addEventListener("click",()=>{hasSave()?load():showToast("尚无存档，请先入局");});
+    $("btn-continue").addEventListener("click",quickContinue);
     $("btn-about").addEventListener("click",()=>$("about-screen").classList.remove("hidden"));
     $("btn-about-close").addEventListener("click",()=>$("about-screen").classList.add("hidden"));
+
+    // 存档面板
+    $("btn-save-close").addEventListener("click",closeSavePanel);
+    $("save-screen").addEventListener("click",(ev)=>{
+      if(ev.target.id==="save-screen") closeSavePanel();
+    });
+    document.querySelectorAll(".save-tab").forEach(t=>{
+      t.addEventListener("click",()=>{
+        saveMode=t.dataset.tab;
+        document.querySelectorAll(".save-tab").forEach(x=>x.classList.toggle("active",x===t));
+        $("save-kicker").textContent=saveMode==="save"?"SAVE":"LOAD";
+        $("save-title").textContent=saveMode==="save"?"存 局":"读 局";
+        renderSaveSlots();
+      });
+    });
 
     $("puzzle-submit").addEventListener("click",submitPuzzle);
     $("puzzle-next").addEventListener("click",continueAfterPuzzle);
@@ -702,7 +841,7 @@
     },{passive:true});
 
     document.addEventListener("keydown",(e)=>{
-      if(e.code==="Escape"){closeBacklog();closeSettings();return;}
+      if(e.code==="Escape"){closeBacklog();closeSettings();closeSavePanel();return;}
       if(e.code==="PageUp" || e.key.toLowerCase()==="b"){openBacklog();return;}
       if(e.key.toLowerCase()==="a"){toggleAuto();return;}
       if(e.key.toLowerCase()==="s"){toggleSkip();return;}
