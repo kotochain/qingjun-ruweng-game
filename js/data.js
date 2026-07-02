@@ -548,6 +548,342 @@ const STORY = {
       {who:"narr", text:"晨光亮起来的时候，我靠在门栏上，看着他青色的背影消失在廊尽头。"},
       {who:"sys", name:"【系统】", text:"第二幕 完成。第三幕「烟花为聘」——生死、抉择、与一场以烟花为聘的告白。", cls:"emc"}
     ],
+    goto:"act3_intro"
+  },
+
+  /* ============ 第三幕 · 烟花为聘 ============ */
+  "act3_intro": {
+    bg:"chihua_room",
+    pov:"heroine",
+    chapter:{sub:"第三幕", title:"烟花为聘", pov:"皇甫赤华 · 视角"},
+    lines:[
+      {who:"narr", text:"上元节。满城灯火。"},
+      {who:"narr", text:"我坐在铜镜前，阿芜替我插上最后一支赤金凤头钗。镜面里那张艳得逼人的脸，已经和二十五天前醒来时完全不同——那是杜盈华的眼神，和皇甫赤华的骨。"},
+      {who:"awu", name:"阿芜", text:"公主……今夜宫里不太平，您带上这个。", sprite:{left:"chihua"}},
+      {who:"narr", text:"她塞过来一柄掌心大小的匕首，银鞘上刻着凤纹——是我生母留下的东西。"},
+      {who:"heroine", name:"皇甫赤华", text:"（阿芜是我的贴身宫女，也是这宫里唯一没被任何人收买的人。）", cls:"emr"},
+      {who:"narr", text:"清夜在门外等我。一身玄色常服，没有佩剑，像个真的来陪妻子看灯的驸马。"},
+      {who:"qingye", name:"雍门清夜", text:"怕么？", cls:"emc", sprite:{right:"qingye_soft", left:"chihua"}},
+      {who:"heroine", name:"皇甫赤华", text:"你问第三遍了。", cls:"emr"},
+      {who:"qingye", name:"雍门清夜", text:"那我再问一遍——怕么？"},
+      {who:"heroine", name:"皇甫赤华", text:"……不怕。有你在。", cls:"emr"},
+      {who:"narr", text:"他笑了。那笑里有什么东西，比今夜满城灯火还亮。"},
+      {who:"qingye", name:"雍门清夜", text:"好。那今夜——跟紧我。", cls:"emc"}
+    ],
+    goto:"fireworks_entry"
+  },
+
+  "fireworks_entry": {
+    bg:"banquet",
+    pov:"heroine",
+    lines:[
+      {who:"narr", text:"烟花宴设在太液池畔。丝竹声里，宫灯如昼。父皇高坐主位，玄色绸带依旧蒙着眼；太子景珩坐于左侧，六皇子景澄坐于右侧。"},
+      {who:"narr", text:"我和清夜入席时，太子举起酒盏，朝我遥遥一笑——那笑里淬着毒。"},
+      {who:"heroine", name:"皇甫赤华", text:"（景珩知道我识破了宫宴的刺杀。他一定知道。今夜这局，他会把我也算进去。）", cls:"emr"},
+      {who:"narr", text:"清夜在案下握住了我的手。他的手心很稳，一点汗都没有。"},
+      {who:"qingye", name:"雍门清夜", text:"记住——烟花第三响时，低头。", cls:"emc", sprite:{center:"qingye_cold"}},
+      {who:"heroine", name:"皇甫赤华", text:"（他没说为什么。我也没问。十年布局，他不会在这一刻出错。）", cls:"emr"},
+      {who:"narr", text:"酒过三巡。司礼太监高声唱喏——"},
+      {who:"narr", text:"「放——烟——花——」"}
+    ],
+    goto:"fireworks_burst"
+  },
+
+  "fireworks_burst": {
+    bg:"banquet",
+    pov:"heroine",
+    lines:[
+      {who:"narr", text:"第一响。金菊在夜空炸开，照亮了满池碎金。"},
+      {who:"narr", text:"第二响。紫玉兰。我看见太子身后的侍卫悄悄把手按上了刀柄。"},
+      {who:"heroine", name:"皇甫赤华", text:"（清夜说的是第三响。为什么是第三响？）", cls:"emr"},
+      {who:"narr", text:"我扫过整座宴席——父皇、太子、景澄、清夜、乐班、宫娥、侍卫……"},
+      {who:"narr", text:"有什么不对。今夜的局，比宫宴那夜复杂得多。有三方人马，三把刀，指向的却不是同一个人。"}
+    ],
+    goto:"puzzle_fireworks"
+  },
+
+  /* ============ 推理节点：烟花夜的三方杀局 ============ */
+  "puzzle_fireworks": {
+    puzzle:{
+      title:"三方杀局",
+      desc:"烟花第三响前，你必须看穿今夜的局——三方势力各怀鬼胎。选出两条真正致命的线索，它们会告诉你：谁要杀谁？",
+      need:2,
+      clues:[
+        {id:"taizi_guard", img:true, name:"太子的侍卫", text:"太子身后的侍卫中，有三人腰带上系着只有东宫私兵才戴的赤绳结——他们不是宫中禁军。", correct:true,
+         reveal:"太子要在烟花第三响动手——他的目标不是景澄，是父皇。弑父篡位，嫁祸雍门。"},
+        {id:"jingcheng_cup", img:true, name:"景澄的酒樽", text:"景澄面前的酒樽比旁人矮半寸——他提前饮过药，今夜不是来宴饮的，是来逼宫的。", correct:false,
+         reveal:"景澄确实带了人马，但他的目标是太子，不是父皇——他要等太子先动手，再以「救驾」之名除储君。这是清夜和他交易的真正筹码。"},
+        {id:"emperor_silk", img:true, name:"父皇的绸带", text:"父皇蒙眼的玄色绸带，不知何时换了——边角绣着只有雍门嫡系才用的暗纹。", correct:true,
+         reveal:"绸带是清夜换的。那上面浸的不是迷药，是解药——解先帝失明之毒。清夜要让那个人，亲眼看着他来索命。"},
+        {id:"music_drum", img:true, name:"鼓点", text:"乐班的鼓点不急不缓，没有宫宴那夜作为信号的急促节拍。", correct:false,
+         reveal:"今夜的信号不是鼓点——是烟花。三响之后，三方同时动作，大乱之中谁是猎手谁是猎物，全看谁先一步看透局。"},
+        {id:"qingye_sword", img:true, name:"清夜无剑", text:"清夜今夜没有佩剑——一个灭门复仇者，在决战之夜不带武器？", correct:false,
+         reveal:"他的刀不在身上。他的刀——是整座宴席的布局。从换绸带，到借景澄的兵，到太子的赤绳私兵，全都是他的刀。"}
+      ],
+      onWin:"puzzle_fw_win",
+      onFail:"puzzle_fw_retry"
+    }
+  },
+
+  "puzzle_fw_retry": {
+    bg:"banquet",
+    pov:"heroine",
+    lines:[
+      {who:"heroine", name:"皇甫赤华", text:"（不对，我漏了什么。再看——每一处异常里，只有两个是真正的刀。）", cls:"emr"}
+    ],
+    goto:"puzzle_fireworks"
+  },
+
+  "puzzle_fw_win": {
+    bg:"banquet",
+    pov:"heroine",
+    lines:[
+      {who:"narr", text:"太子的赤绳私兵——父皇绸带上的雍门暗纹——两条线绞在一起，我猛地懂了。"},
+      {who:"heroine", name:"皇甫赤华", text:"（太子要杀父皇，清夜要让父皇醒来看他索命，景澄要等太子动手后救驾夺位——三方、三条命、一把火。）", cls:"emr"},
+      {who:"heroine", name:"皇甫赤华", text:"（第三响。第三响之后，烟花炸开，太液池畔会变成血池。）", cls:"emr"},
+      {who:"narr", text:"我转头看向清夜。他没看我，他在看主位那个蒙眼的老人——他的眼里没有恨，没有喜，只有一种十二年压在井底终于看见天的静。"},
+      {who:"narr", text:"第三响——"},
+      {who:"narr", text:"「砰！」"},
+      {who:"narr", text:"漫天烟花炸开的同一瞬，太子的人拔刀了。"}
+    ],
+    goto:"choice_final"
+  },
+
+  /* ============ 最终抉择 ============ */
+  "choice_final": {
+    bg:"banquet",
+    pov:"heroine",
+    isChoice:true,
+    prompt:"血光溅起的刹那——你怎么做？",
+    sprite:{center:"qingye_cold"},
+    choices:[
+      {
+        text:"冲上去挡在清夜身前——我来做他的盾",
+        hint:"赌命。他护了你一路，你也要护他一次。",
+        set:{aff:6},
+        toast:"心意 +6 · 你扑向他的背影",
+        goto:"after_final_shield"
+      },
+      {
+        text:"高呼「护驾」，按清夜的安排低下头——信他",
+        hint:"信任。他布了十年的局，不该被你打乱。",
+        set:{aff:4},
+        toast:"心意 +4 · 你低头，让他的棋走完",
+        goto:"after_final_trust"
+      },
+      {
+        text:"拔出阿芜给的匕首，自己冲向父皇——我要亲手改写结局",
+        hint:"破局。不做任何人的棋子，包括他的。",
+        set:{aff:3},
+        toast:"心意 +3 · 你提刃而出，乱了三盘棋",
+        goto:"after_final_break"
+      }
+    ]
+  },
+
+  "after_final_shield": {
+    bg:"palace_night",
+    pov:"heroine",
+    lines:[
+      {who:"narr", text:"我不知道太子的刀是指向谁的——我只看见一名赤绳侍卫越过人群，刀锋朝着清夜的后心直刺过来。"},
+      {who:"heroine", name:"皇甫赤华", text:"清夜——！！！", cls:"emr"},
+      {who:"narr", text:"我扑过去。银凤匕首从袖中滑出，我甚至来不及拔——身体先于脑子动了。"},
+      {who:"narr", text:"刀锋入肉的声音，闷得像烟花落进水里。不是我的血——是清夜在我扑过去的刹那，转身，用自己的肩接了那一刀。"},
+      {who:"qingye", name:"雍门清夜", text:"……蠢。", cls:"emc", sprite:{center:"qingye_cold"}},
+      {who:"heroine", name:"皇甫赤华", text:"你才蠢！我替你挡——", cls:"emr"},
+      {who:"qingye", name:"雍门清夜", text:"我活了二十八年，等的就是今天。你以为我会让我的妻，死在我的复仇前面？", cls:"emc", sprite:{center:"qingye_soft"}},
+      {who:"narr", text:"他肩上火红一片，手却稳得可怕。他从袖中抽出一柄我从未见过的薄刃——那不是兵器，是十二年前雍门灭门那夜，从他父亲胸口拔出来的、属于御前侍卫的刀。"}
+    ],
+    goto:"qingye_pov_final"
+  },
+
+  "after_final_trust": {
+    bg:"palace_night",
+    pov:"heroine",
+    lines:[
+      {who:"heroine", name:"皇甫赤华", text:"护——驾——！！！", cls:"emr"},
+      {who:"narr", text:"我按他说的低下头，在一片混乱里蜷进案下。赤绳侍卫从我头顶掠过，刀锋的寒气擦碎了我鬓边那支赤金凤钗。"},
+      {who:"narr", text:"三息之间，景澄的人动了。他们不是来救驾的——他们是来包围太子的。太子的赤绳兵还没冲到主位，就被景澄的人从背后包了饺子。"},
+      {who:"narr", text:"而清夜——他在乱局里像一道青色的影子，掠过倒下的侍卫，径直走向主位。"},
+      {who:"heroine", name:"皇甫赤华", text:"（他的局走完了。他要去见那个人了。）", cls:"emr"},
+      {who:"narr", text:"我从案下爬起来，顾不上鬓发散乱，朝主位跑去。"}
+    ],
+    goto:"qingye_pov_final"
+  },
+
+  "after_final_break": {
+    bg:"palace_night",
+    pov:"heroine",
+    lines:[
+      {who:"narr", text:"没有人等。我拔出银凤匕首，逆着奔逃的人群，冲向主位。"},
+      {who:"heroine", name:"皇甫赤华", text:"（太子的人要杀他，景澄要等太子杀他，清夜要亲手杀他——三个人都要他死。那这个人如果死了，三盘棋全赢，唯一输的人是谁？是被卷进来的所有人。）", cls:"emr"},
+      {who:"narr", text:"我不是要救父皇。我是要救——所有被这盘棋碾进去的人。包括清夜。"},
+      {who:"narr", text:"我冲到主位前，把银凤匕首横在那蒙眼老人的脖颈前——"},
+      {who:"heroine", name:"皇甫赤华", text:"都——停——手——！！！", cls:"emr", sprite:{left:"chihua"}},
+      {who:"narr", text:"满场死寂。太子的刀停在半空。景澄的弓箭手僵在弦上。清夜立在三步之外，手里的薄刃映着烟花。"},
+      {who:"qingye", name:"雍门清夜", text:"……盈华。让开。", cls:"emc", sprite:{right:"qingye_cold", left:"chihua"}},
+      {who:"heroine", name:"皇甫赤华", text:"不让。你布了十年的局，今天我替你改一步。", cls:"emr"}
+    ],
+    goto:"qingye_pov_final"
+  },
+
+  /* ============ 清夜视角：血月 ============ */
+  "qingye_pov_final": {
+    bg:"palace_night",
+    pov:"qingye",
+    chapter:{sub:"间章", title:"井中月", pov:"雍门清夜 · 视角"},
+    lines:[
+      {who:"narr", text:"（清夜视角）"},
+      {who:"narr", text:"刀锋、血、烟花。他等这一天等了十二年，从十二岁那个井底的夜晚等到现在。"},
+      {who:"qingye", name:"雍门清夜", text:"（父皇，你当年杀我全家三十七口，连我那三岁的妹妹都没放过。她的小手里还攥着半块桂花糕。）", cls:"emc", sprite:{center:"qingye_cold"}},
+      {who:"qingye", name:"雍门清夜", text:"（我算过一千种今夜的结局。太子死、景澄死、那个人死，我死——无论哪一种，这盘棋都该在今夜收了。）"},
+      {who:"narr", text:"可他算漏了一个变量。"},
+      {who:"narr", text:"是那个在他身后扑过来的身影，是那个低着头蜷在案下还死死抓着他衣角的手，是那个横刀护在仇人面前喊「让开」的女人。"},
+      {who:"qingye", name:"雍门清夜", text:"（杜盈华……你到底是来破我的局，还是来救我的命？）", cls:"emc", sprite:{center:"qingye_soft"}},
+      {who:"qingye", name:"雍门清夜", text:"（我从十二岁起，就没打算活着走出这盘棋。可你来了之后……我开始想，也许……也许活着也不错。）"}
+    ],
+    goto:"reveal_truth"
+  },
+
+  /* ============ 真相大白 ============ */
+  "reveal_truth": {
+    bg:"palace_night",
+    pov:"heroine",
+    lines:[
+      {who:"narr", text:"烟花还在天上一朵一朵地开。我站在主位前，匕首横在那蒙眼老人颈边，手在抖。"},
+      {who:"heroine", name:"皇甫赤华", text:"父皇——不，陛下。绸带已经被我扯下来了。您的眼睛，是时候睁开了。", cls:"emr", sprite:{left:"chihua"}},
+      {who:"narr", text:"玄色绸带飘落。皇帝缓缓睁眼——那双眼睛里没有失明的浑浊，只有清明的、恐惧的光。"},
+      {who:"heroine", name:"皇甫赤华", text:"（清夜的解药起效了。他能看见了。）", cls:"emr"},
+      {who:"narr", text:"老人看见了满场血光、持刀的太子、张弓的景澄、立在烟花下的青衣男子——"},
+      {who:"narr", text:"——他认出了清夜手里的那柄薄刃。"},
+      {who:"emperor", name:"皇帝", text:"……雍门……雍门彻的儿子……", cls:"emc"},
+      {who:"qingye", name:"雍门清夜", text:"陛下记性真好。十二年了，您终于肯叫一声我父亲的名字。", cls:"emc", sprite:{right:"qingye_cold", left:"chihua"}},
+      {who:"narr", text:"清夜一步步走过来。他肩上的血还在滴，每一步都在金砖上留一个血印。"},
+      {who:"qingye", name:"雍门清夜", text:"天命七年秋，您还是东宫太子，为了夺嫡，假传北境急报，将我父亲——您的结义兄长——骗回京中，满门抄斩。", cls:"emc"},
+      {who:"qingye", name:"雍门清夜", text:"您毒杀了我父亲、母亲、祖母、幼妹、三十七口人。放火烧了雍门府，对外说通敌叛国。", cls:"emc"},
+      {who:"qingye", name:"雍门清夜", text:"——而我母亲临死前，把真相写在血书上，托人送进了宫。收血书的人，是我当时的太子妃，后来的皇后……也就是赤华的生母。", cls:"emc", sprite:{right:"qingye_soft", left:"chihua"}},
+      {who:"heroine", name:"皇甫赤华", text:"（……我母亲知道真相？）", cls:"emr"},
+      {who:"narr", text:"皇帝浑身发抖，一句话都说不出来。"},
+      {who:"qingye", name:"雍门清夜", text:"赤华的母亲知道真相，所以她在赤华三岁那年「病逝」了。陛下，是您亲手毒杀了自己的皇后——因为她知道得太多了。", cls:"emc", sprite:{right:"qingye_cold", left:"chihua"}},
+      {who:"heroine", name:"皇甫赤华", text:"（……他告诉了我我的身世。他在告诉我——皇甫赤华也是这场仇里的人。）", cls:"emr"},
+      {who:"narr", text:"全场死寂。烟花最后一响，散作满天星雨。"}
+    ],
+    goto:"choice_after_truth"
+  },
+
+  "choice_after_truth": {
+    bg:"palace_night",
+    pov:"heroine",
+    isChoice:true,
+    prompt:"真相摊在所有人面前。最后一步——",
+    sprite:{right:"qingye_cold", left:"chihua"},
+    choices:[
+      {
+        text:"把匕首递给清夜：「这一刀，你来。但之后——跟我走。」",
+        hint:"HE 线。给他复仇，也给他归处。",
+        set:{aff:5},
+        toast:"心意 +5 · 你把刀交给他",
+        goto:"ending_he"
+      },
+      {
+        text:"把匕首扔在地上：「杀他是罪。雍门的血，不能用你的手来还。」",
+        hint:"NE/BE 线。拦他。赌他会不会停手。",
+        set:{aff:2},
+        toast:"心意 +2 · 你弃了刀",
+        goto:"ending_ne"
+      },
+      {
+        text:"转向景澄和太子：「你们两个，都跪下。今日不是复仇局——是清算局。」",
+        hint:"破局线。把私仇翻成朝局，代价最大。",
+        set:{aff:3},
+        toast:"心意 +3 · 你要做执棋者",
+        goto:"ending_te"
+      }
+    ]
+  },
+
+  /* ============ 结局 ============ */
+  "ending_he": {
+    bg:"qingye_garden",
+    pov:"heroine",
+    chapter:{sub:"终章", title:"烟花为聘", pov:"杜盈华 · 尾声"},
+    lines:[
+      {who:"narr", text:"他接过那柄银凤匕首，看了很久。"},
+      {who:"narr", text:"最后，他没有把刀刺向皇帝——他把刀转过来，用刀背，砸在了皇帝瘫痪的右腿上。"},
+      {who:"qingye", name:"雍门清夜", text:"一刀还你，太便宜了。", cls:"emc", sprite:{center:"qingye_soft"}},
+      {who:"qingye", name:"雍门清夜", text:"我要你活着。活着看你的儿子们自相残杀，活着看你的江山落到别人手里，活着想起我雍门三十七口——夜夜做噩梦。", cls:"emc"},
+      {who:"narr", text:"景澄在那夜登基。太子景珩以谋逆罪赐死。太上皇被软禁于永安宫，余生不见天日。"},
+      {who:"narr", text:"清夜在朝堂上辞了所有官职，带着我离开了长安。"},
+      {who:"narr", text:"我没有回现代。系统在那夜之后再没响过——也许它觉得，杜盈华已经找到了属于自己的结局。"},
+      {who:"narr", text:"江南小镇。药庐。院子里种着一棵桂花树。"},
+      {who:"awu", name:"阿芜", text:"先生！夫人！吃饭了——今日先生熬的莲藕排骨汤，可鲜了！"},
+      {who:"narr", text:"他从药炉边走过来，身上还带着药香，替我拂去肩上落的桂花。"},
+      {who:"qingye", name:"雍门清夜", text:"杜盈华。", cls:"emc", sprite:{center:"qingye_soft"}},
+      {who:"heroine", name:"杜盈华", text:"嗯？", cls:"emr"},
+      {who:"qingye", name:"雍门清夜", text:"那夜烟花第三响，我本打算杀完人就自杀的。", cls:"emc"},
+      {who:"heroine", name:"杜盈华", text:"……我知道。", cls:"emr"},
+      {who:"qingye", name:"雍门清夜", text:"是你扑过来的那一刻，我改了主意。", cls:"emc"},
+      {who:"narr", text:"他从怀里掏出一支旧旧的银凤钗——那是上元夜被刀锋劈碎的那支，他花了三个月，亲手一点一点补好的。"},
+      {who:"qingye", name:"雍门清夜", text:"我用一场烟花，聘你一辈子。你愿意吗？", cls:"emc", sprite:{center:"qingye_soft"}},
+      {who:"heroine", name:"杜盈华", text:"……傻子。我早就愿意了。", cls:"emr"},
+      {who:"narr", text:"桂花落下来的时候，他吻了我。远处镇上有人放烟花，一朵一朵的，像那场改变了所有人命运的夜宴。"},
+      {who:"sys", name:"【系统】", text:"——恭喜宿主。达成真结局：烟花为聘。", cls:"emc"},
+      {who:"sys", name:"【系统】", text:"这一次，没有人死在局里。", cls:"emc"}
+    ],
+    goto:"__end__"
+  },
+
+  "ending_ne": {
+    bg:"palace_night",
+    pov:"heroine",
+    chapter:{sub:"终章", title:"同局中人", pov:"皇甫赤华 · 尾声"},
+    lines:[
+      {who:"narr", text:"匕首落在金砖上，发出清脆的响。"},
+      {who:"heroine", name:"皇甫赤华", text:"清夜。杀他是罪。你父亲在天有灵，不会想要你手上沾了血之后，再陪他一起死。", cls:"emr", sprite:{right:"qingye_cold", left:"chihua"}},
+      {who:"narr", text:"他举着薄刃的手，停在半空。很久。久到烟花全部落尽，久到太子的人被景澄的兵按在地上。"},
+      {who:"qingye", name:"雍门清夜", text:"……十二年。我等了十二年。", cls:"emc", sprite:{right:"qingye_soft", left:"chihua"}},
+      {who:"heroine", name:"皇甫赤华", text:"我陪你等下一个十二年。用他活着的每一天，慢慢还。", cls:"emr"},
+      {who:"narr", text:"他终于把刀放下了。当啷一声，像十二年的石头落地。"},
+      {who:"narr", text:"那夜之后，太上皇退位，景澄登基，清夜以驸马之身入朝为相。"},
+      {who:"narr", text:"他没有辞官，我也没有回现代。我们像无数对貌合神离的朝堂夫妻一样，住在公主府，吃饭、议事、偶尔吵架。"},
+      {who:"narr", text:"只是每天睡前他都会来我的院子，坐一会儿。什么也不说，就坐坐。"},
+      {who:"narr", text:"某个下雨的夜晚，他坐在廊下，忽然开口——"},
+      {who:"qingye", name:"雍门清夜", text:"杜盈华。", cls:"emc", sprite:{center:"qingye_soft"}},
+      {who:"heroine", name:"杜盈华", text:"嗯？", cls:"emr"},
+      {who:"qingye", name:"雍门清夜", text:"这盘棋，我下到一半不想下了。你呢？", cls:"emc"},
+      {who:"heroine", name:"杜盈华", text:"我本来就不是来下棋的。我是来……找人回家的。", cls:"emr"},
+      {who:"narr", text:"他伸手过来，握住了我的手。雨下了一整夜。"},
+      {who:"sys", name:"【系统】", text:"达成结局：同局中人。", cls:"emc"},
+      {who:"sys", name:"【系统】", text:"他没有杀父，也没有自杀。棋局还在，但你们不再是各自为战。", cls:"emc"}
+    ],
+    goto:"__end__"
+  },
+
+  "ending_te": {
+    bg:"palace_hall",
+    pov:"heroine",
+    chapter:{sub:"终章", title:"执棋者", pov:"皇甫赤华 · 尾声"},
+    lines:[
+      {who:"narr", text:"我提刀转身，目光扫过太子和景澄。"},
+      {who:"heroine", name:"皇甫赤华", text:"皇甫景珩谋逆，证据确凿。皇甫景澄私调兵马，亦非无罪。", cls:"emr", sprite:{left:"chihua"}},
+      {who:"heroine", name:"皇甫赤华", text:"你们两个——都给我跪下。"},
+      {who:"narr", text:"全场鸦雀无声。我是嫡长公主，是这宫里位份最高的皇室成员——在父皇无法亲政、太子有罪、景澄带刀闯宫的此刻，我是唯一有资格收拾这局的人。"},
+      {who:"narr", text:"景澄跪了。太子被按着跪下了。清夜站在原地，看着我，眼里第一次出现了一种我读不懂的神情。"},
+      {who:"heroine", name:"皇甫赤华", text:"（我破了他的局。他生气么？……也许吧。但这是我能想到的、唯一不让任何人死的办法。）", cls:"emr"},
+      {who:"narr", text:"那夜之后，太子被废，景澄被圈禁。我以长公主身份临朝称制三年，直到太上皇驾崩、扶持幼帝登基。"},
+      {who:"narr", text:"清夜辞了官，离开长安。他走的那天，我在城楼上站了一整天。他没回头。"},
+      {who:"narr", text:"又过了三年。"},
+      {who:"awu", name:"阿芜", text:"长公主！宫门外……宫门外有个青衣的大夫，说要给您献一味能治「思乡病」的药。"},
+      {who:"narr", text:"我扔下奏疏，赤着脚跑到宫门。"},
+      {who:"narr", text:"他站在那里，风尘仆仆，肩上还是当年那道疤。手里提着一筐桂花糕。"},
+      {who:"qingye", name:"雍门清夜", text:"长公主殿下。", cls:"emc", sprite:{center:"qingye_soft"}},
+      {who:"heroine", name:"皇甫赤华", text:"……你还知道回来？", cls:"emr"},
+      {who:"qingye", name:"雍门清夜", text:"账算完了。我父亲的冤屈已雪，你母亲的名分已复。现在……", cls:"emc"},
+      {who:"qingye", name:"雍门清夜", text:"现在来收我的聘礼。你当年破我那局的账——我要你用一辈子来还。", cls:"emc"},
+      {who:"narr", text:"我笑了。笑着笑着眼泪就掉下来了。"},
+      {who:"sys", name:"【系统】", text:"达成结局：执棋者。", cls:"emc"},
+      {who:"sys", name:"【系统】", text:"你没有选「被保护」，也没有选「被复仇」。你选了自己走这条路。他花了六年，才追上你。", cls:"emc"}
+    ],
     goto:"__end__"
   }
 
@@ -560,7 +896,8 @@ const ASSETS = {
     palace_night:"assets/bg_palace_night.jpg",
     chihua_room:"assets/bg_room.jpg",
     palace_hall:"assets/bg_hall.jpg",
-    banquet:"assets/bg_banquet.jpg"
+    banquet:"assets/bg_banquet.jpg",
+    qingye_garden:"assets/bg_qingye_garden.jpg"
   },
   sprite:{
     qingye_normal:"assets/qingye_normal_cut.png",

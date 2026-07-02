@@ -20,7 +20,14 @@
     "letter_from_palace": "第二幕 · 父皇密令",
     "night_visit": "第二幕 · 夜雨同行",
     "rooftop_scene": "第二幕 · 屋顶剖白",
-    "act2_end": "第二幕 · 终"
+    "act2_end": "第二幕 · 终",
+    "act3_intro": "第三幕 · 烟花前夜",
+    "fireworks_entry": "第三幕 · 烟花宴",
+    "puzzle_fireworks": "第三幕 · 三方杀局",
+    "reveal_truth": "第三幕 · 真相",
+    "ending_he": "终章 · 烟花为聘",
+    "ending_ne": "终章 · 同局中人",
+    "ending_te": "终章 · 执棋者"
   };
   // 章节锚点：每个章节的起始节点，用于快速跳转
   const CHAPTER_ANCHORS = [
@@ -29,7 +36,8 @@
     {node:"banquet_intro", label:"第一幕 · 宫宴",   desc:"上元夜宴，暗流涌动"},
     {node:"act2_intro",    label:"第二幕 · 赐婚",   desc:"圣旨赐婚，风起东宫"},
     {node:"cohabit_days",  label:"第二幕 · 假面",   desc:"婚后相处，试探与真心"},
-    {node:"night_visit",   label:"第二幕 · 夜雨",   desc:"夜雨同行，心意渐明"}
+    {node:"night_visit",   label:"第二幕 · 夜雨",   desc:"夜雨同行，心意渐明"},
+    {node:"act3_intro",    label:"第三幕 · 烟花",   desc:"上元灯节，生死一局"}
   ];
   function chapterOf(nodeId){
     return CHAPTER_TITLES[nodeId] || (nodeId && nodeId.startsWith("qingye_pov") ? "视角 · 雍门清夜" : "剧情进行中");
@@ -793,18 +801,46 @@
   }
 
   function endGame(){
-    stopAutoSkip();
+    stopAutoSkip();stopBgm();
     dlgBox.classList.add("hidden");
     const ov=document.createElement("div");
     ov.className="overlay";
+    let endingTitle="全剧终", endingDesc="";
+    const node=state.node;
+    if(node==="ending_he"){
+      endingTitle="❖ 烟花为聘 · 真结局 ❖";
+      endingDesc="杜盈华与雍门清夜归隐江南，药庐桂花，岁岁年年。<br>这是所有人都活下来的结局。";
+    }else if(node==="ending_ne"){
+      endingTitle="◇ 同局中人 ◇";
+      endingDesc="复仇未竟，棋局未完。<br>他们仍在朝堂上并肩走着，路还长。";
+    }else if(node==="ending_te"){
+      endingTitle="❖ 执棋者 ❖";
+      endingDesc="她选了自己的路，他追了六年。<br>当棋手比当棋子难得多——但她走过来了。";
+    }else{
+      endingTitle="第二幕 · 终";
+      endingDesc="上元灯节、烟花宴、太子与景澄的棋局、清夜藏了十年的血债——都将在第三幕「烟花为聘」落下帷幕。";
+    }
     ov.innerHTML=`<div class="overlay-card" style="text-align:center">
-      <h2>第二幕 · 终</h2>
+      <h2>${endingTitle}</h2>
       <p>你与雍门清夜的「心意」停在 <b style="color:var(--rose)">${state.aff}</b>。</p>
-      <p class="dim">上元灯节、烟花宴、太子与景澄的棋局、以及清夜藏了十年的那笔血债——都将在第三幕「烟花为聘」中落下帷幕。</p>
-      <button class="soft-btn" id="end-back">回到标题</button>
+      <p class="dim">${endingDesc}</p>
+      <div style="margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="soft-btn" id="end-back">回到标题</button>
+        ${(node==="ending_he"||node==="ending_ne"||node==="ending_te")?'<button class="soft-btn cyan" id="end-again">从头再玩</button>':""}
+      </div>
     </div>`;
     document.body.appendChild(ov);
     $("end-back").addEventListener("click",()=>{ov.remove();backToTitle();});
+    const again=$("end-again");
+    if(again){
+      again.addEventListener("click",()=>{
+        ov.remove();
+        localStorage.removeItem(SAVE_KEY);
+        localStorage.removeItem("qjrw_read_lines_v1");
+        localStorage.removeItem("qjrw_read_choices_v1");
+        startGame();
+      });
+    }
   }
 
   function fmtTime(ts){
